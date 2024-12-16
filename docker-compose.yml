@@ -1,0 +1,75 @@
+services:
+  # frontend:
+  #   build: 
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   ports: 
+  #     - "3000:3000"
+  #   networks:
+  #     - fleetflow-v1-network
+  #   depends_on:
+  #     - gobackend
+  #   environment:
+  #     - REACT_APP_API_URL=http://localhost:8000/api/v1
+  #   healthcheck:
+  #     test: ["CMD", "curl", "--fail", "http://localhost:3000"]
+  #     interval: 60s
+  #     retries: 5
+  #     start_period: 20s
+  #     timeout: 10s
+
+  gobackend:
+    container_name: gobackend
+    build:
+      context: ./backend
+      dockerfile: go.dockerfile
+    environment:
+      - DATABASE_URL=postgres://postgres_user:postgres_password@postgres_db:5432/fleetflow?sslmode=disable
+      - JWT_SECRET=3bZ/QyllJNEz9BzmmnM4twkJ8fy8BPhxudyxKGBSSdA=
+    ports:
+      - '8000:8000'
+    networks:
+      - fleetflow-v1-network
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    restart: on-failure
+
+  postgres_db:
+    container_name: postgres_db
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/db/init/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - fleetflow-v1-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+  #   depends_on:
+  #     - postgres_db
+  #   networks:
+  #     - fleetflow-v1-network
+
+networks:
+  fleetflow-v1-network:
+    driver: bridge
+
+volumes:
+  pgdata: {}
