@@ -447,7 +447,7 @@ docker exec postgres_db psql -U postgres_user -d fleetflow -c "\dt"
 
 Interactively check on users table:
 ```bash
-docker exec postgres_db psql -U postgres_user -d fleetflow -c "SELECT * FROM users;
+docker exec postgres_db psql -U postgres_user -d fleetflow -c "SELECT * FROM users;"
 ```
 
 Interactively check on deliveries table:
@@ -470,7 +470,7 @@ All endpoints may return the following error responses:
 - **409 Conflict**: Resource already exists
 - **500 Internal Server Error**: Server-side error
 
-## Role IDs
+## Roles available
 - 1: admin
 - 2: fleet_manager
 - 3: driver
@@ -478,7 +478,7 @@ All endpoints may return the following error responses:
 - 5: customer
 
 ## Testing
-You can use curl commands to test these endpoints. Remember to:
+Use curl commands to test these endpoints. Remember to:
 1. Start with registration
 2. Login to get access token
 3. Use the access token in the Authorization header for subsequent requests
