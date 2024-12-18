@@ -544,41 +544,13 @@ INSERT INTO delivery_statuses (id, name, description) VALUES
     (3, 'delivered', 'Delivery has been completed'),
     (4, 'cancelled', 'Delivery has been cancelled');
 
--- Insert sample vehicles
-INSERT INTO vehicles (plate_number, type, make, model, year, capacity, fuel_type, status_id, mileage, current_location_latitude, current_location_longitude, current_location_updated_at, fuel_efficiency_rating, total_fuel_consumption, total_maintenance_cost, vehicle_images, registration_document_image_url, insurance_document_image_url)
-VALUES 
-    ('KAA123A', 'Truck', 'Isuzu', 'FVZ', 2022, 10000, 'Diesel', 1, 50000, 47.6062, -122.3321, '2024-01-20 08:00:00+00', 4.5, 1500.50, 5000.00,
-    '[
-        {"type": "front", "url": "https://fleetflow-assets.s3.amazonaws.com/vehicles/KAA123A/front.jpg"},
-        {"type": "back", "url": "https://fleetflow-assets.s3.amazonaws.com/vehicles/KAA123A/back.jpg"},
-        {"type": "side", "url": "https://fleetflow-assets.s3.amazonaws.com/vehicles/KAA123A/side.jpg"}
-    ]'::jsonb,
-    'https://fleetflow-assets.s3.amazonaws.com/vehicles/KAA123A/registration.pdf',
-    'https://fleetflow-assets.s3.amazonaws.com/vehicles/KAA123A/insurance.pdf'),
-    ('KBB456B', 'Van', 'Toyota', 'HiAce', 2023, 2000, 'Diesel', 2, 25000, 45.5155, -122.6789, '2024-01-20 08:00:00+00', 4.2, 800.25, 2500.00,
-    '[
-        {"type": "front", "url": "https://fleetflow-assets.s3.amazonaws.com/vehicles/KBB456B/front.jpg"},
-        {"type": "back", "url": "https://fleetflow-assets.s3.amazonaws.com/vehicles/KBB456B/back.jpg"},
-        {"type": "side", "url": "https://fleetflow-assets.s3.amazonaws.com/vehicles/KBB456B/side.jpg"}
-    ]'::jsonb,
-    'https://fleetflow-assets.s3.amazonaws.com/vehicles/KBB456B/registration.pdf',
-    'https://fleetflow-assets.s3.amazonaws.com/vehicles/KBB456B/insurance.pdf'),
-    ('KCC789C', 'Pickup', 'Toyota', 'Hilux', 2023, 1000, 'Diesel', 3, 15000, 37.8044, -122.2711, '2024-01-20 08:00:00+00', 4.0, 600.75, 1500.00,
-    '[
-        {"type": "front", "url": "https://fleetflow-assets.s3.amazonaws.com/vehicles/KCC789C/front.jpg"},
-        {"type": "back", "url": "https://fleetflow-assets.s3.amazonaws.com/vehicles/KCC789C/back.jpg"},
-        {"type": "side", "url": "https://fleetflow-assets.s3.amazonaws.com/vehicles/KCC789C/side.jpg"}
-    ]'::jsonb,
-    'https://fleetflow-assets.s3.amazonaws.com/vehicles/KCC789C/registration.pdf',
-    'https://fleetflow-assets.s3.amazonaws.com/vehicles/KCC789C/insurance.pdf');
-
 INSERT INTO vehicles (plate_number, type, make, model, year, capacity, fuel_type, status_id, gps_unit_id, last_maintenance, next_maintenance, mileage, insurance_expiry, current_location_latitude, current_location_longitude, current_location_updated_at, fuel_efficiency_rating, total_fuel_consumption, total_maintenance_cost, vehicle_images, registration_document_image_url, insurance_document_image_url)
 VALUES 
-('ABC123', 'Truck', 'Ford', 'F-150', 2022, 1000, 'Gasoline', 1, 'GPS123', NULL, NULL, 15000, '2025-12-31', 40.7128, -74.0060, NULL, 15.5, 200.0, 500.0, '[]', NULL, NULL),
+('KAA123A', 'Truck', 'Isuzu', 'FVZ', 2022, 10000, 'Diesel', 1, 'GPS123', NULL, NULL, 15000, '2025-12-31', 40.7128, -74.0060, NULL, 15.5, 200.0, 500.0, '[]', NULL, NULL),
 ('XYZ456', 'Van', 'Toyota', 'Sienna', 2021, 800, 'Gasoline', 1, 'GPS456', NULL, NULL, 12000, '2025-12-31', 34.0522, -118.2437, NULL, 18.0, 150.0, 300.0, '[]', NULL, NULL), 
 ('DEF123', 'Truck', 'Ford', 'F-150', 2022, 1000, 'Gasoline', 1, 'GPS789', NULL, NULL, 15000, '2025-12-31', 40.7128, -74.0060, NULL, 15.5, 200.0, 500.0, '[]', NULL, NULL),
 ('JKL456', 'Van', 'Toyota', 'Sienna', 2021, 800, 'Gasoline', 1, 'GPS012', NULL, NULL, 12000, '2025-12-31', 34.0522, -118.2437, NULL, 18.0, 150.0, 300.0, '[]', NULL, NULL),
-('ABC456', 'Truck', 'Ford', 'F-150', 2022, 1000, 'Gasoline', 1, 'GPS012', NULL, NULL, 12000, '2025-12-31', 34.0522, -118.2437, NULL, 18.0, 150.0, 300.0, '[]', NULL, NULL);
+('ABC456', 'Truck', 'Ford', 'F-150', 2022, 1000, 'Gasoline', 1, 'GPS013', NULL, NULL, 12000, '2025-12-31', 34.0522, -118.2437, NULL, 18.0, 150.0, 300.0, '[]', NULL, NULL);
 
 INSERT INTO driver_profiles (
     user_id,
@@ -597,7 +569,7 @@ INSERT INTO driver_profiles (
 ) VALUES 
 (1, 'ABC12345', 'Class B', '2025-12-31', 'Truck', '5', ARRAY['CDL', 'Hazmat'], 1, 1, 4.5, 10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (2, 'XYZ98765', 'Class A', '2024-11-30', 'Van', '3', ARRAY['CDL'], 1, NULL, 4.0, 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-(3, 'DEF45678', 'Class C', '2023-10-31', 'Pickup', '2', ARRAY['CDL'], 1, 1, 3.5, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+(3, 'DL123456', 'Class A', '2025-12-31', 'Truck', '5', ARRAY['CDL'], 1, 1, 4.5, 10, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (4, 'QYU98765', 'Class A', '2024-11-30', 'Van', '3', ARRAY['CDL'], 1, NULL, 4.0, 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 (5, 'RTE56765', 'Class A', '2024-11-30', 'Truck', '3', ARRAY['CDL'], 1, NULL, 4.0, 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
