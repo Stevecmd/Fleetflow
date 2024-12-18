@@ -9,7 +9,7 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await login(identifier, password);
+      await login({ identifier, password });
     } catch (error) {
       // Error is handled by AuthProvider
     }

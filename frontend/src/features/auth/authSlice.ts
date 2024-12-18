@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../../types';
+import { jwtDecode } from 'jwt-decode';
 
 interface AuthState {
   user: User | null;
@@ -10,10 +11,23 @@ interface AuthState {
   error: string | null;
 }
 
+const getUserFromStorage = () => {
+  const storedUser = localStorage.getItem('user');
+  const token = localStorage.getItem('accessToken');
+
+  if (storedUser && token) {
+    const user = JSON.parse(storedUser);
+    const decoded: any = jwtDecode(token);
+    return {
+      ...user,
+      role: decoded.role_name
+    };
+  }
+  return null;
+};
+
 const initialState: AuthState = {
-  user: localStorage.getItem('user') 
-    ? JSON.parse(localStorage.getItem('user')!) 
-    : null,
+  user: getUserFromStorage(),
   token: localStorage.getItem('accessToken'),
   refreshToken: localStorage.getItem('refreshToken'),
   isAuthenticated: !!localStorage.getItem('accessToken'),
@@ -60,6 +74,8 @@ const authSlice = createSlice({
       state.token = null;
       state.refreshToken = null;
       state.isAuthenticated = false;
+      state.loading = false;
+      state.error = null;
       
       // Clear localStorage on logout
       localStorage.removeItem('user');
