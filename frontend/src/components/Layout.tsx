@@ -1,10 +1,10 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthProvider';
 import Logo from '../assets/logo.svg';
 
 const Layout: React.FC = () => {
-  const { logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -31,12 +31,21 @@ const Layout: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center">
-              <button
-                onClick={logout}
-                className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                Logout
-              </button>
+              {isAuthenticated ? (
+                <button
+                  onClick={logout}
+                  className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  to="/login"
+                  className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         </div>
