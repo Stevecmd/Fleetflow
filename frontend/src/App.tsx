@@ -20,11 +20,11 @@ const DashboardRouter: React.FC = () => {
       return <Navigate to="/dashboard/driver" replace />;
     case 'loader':
       return <Navigate to="/dashboard/loader" replace />;
-    case 'manager':
-      return <Navigate to="/dashboard/manager" replace />;
-    case 'fleetmanager':
-      return <Navigate to="/dashboard/fleetmanager" replace />;
-    default:
+      case 'admin':
+        return <Navigate to="/dashboard/admin" replace />;
+      case 'manager':
+        return <Navigate to="/dashboard/manager" replace />;
+      default:
       return <Navigate to="/login" replace />;
   }
 };
