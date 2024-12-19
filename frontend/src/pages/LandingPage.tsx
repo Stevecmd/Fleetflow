@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Logo from '../../assets/logo.svg';
+import Logo from './../assets/logo.svg';
 const LandingPage: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
