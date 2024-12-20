@@ -58,7 +58,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			if claims["role_name"] == "driver" {
 				// Allow access to driver-specific endpoints
 				next.ServeHTTP(w, r.WithContext(ctx))
-			} else if claims["role_name"] == "fleet_manager" || claims["role_name"] == "admin" {
+			} else if claims["role_name"] == "fleet_manager" || claims["role_name"] == "admin" || claims["role_name"] == "customer" {
 				// Allow access to all endpoints
 				next.ServeHTTP(w, r.WithContext(ctx))
 			} else {
