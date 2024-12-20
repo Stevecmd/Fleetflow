@@ -112,15 +112,26 @@ func main() {
 	router.HandleFunc("/api/v1/users/{userID}", middleware.AuthMiddleware(handlers.GetUserProfile)).Methods("GET")
 	router.HandleFunc("/api/v1/users/{userID}", middleware.AuthMiddleware(handlers.UpdateUserProfile)).Methods("PUT")
 
+	// Customer routes
+	router.HandleFunc("/api/v1/users/{userID}/deliveries", middleware.AuthMiddleware(handlers.GetCustomerDeliveries(db))).Methods("GET")
+	router.HandleFunc("/api/v1/users/{userID}/invoices", middleware.AuthMiddleware(handlers.GetCustomerInvoices(db))).Methods("GET")
+	router.HandleFunc("/api/v1/users/{userID}/feedback", middleware.AuthMiddleware(handlers.GetCustomerFeedback(db))).Methods("GET")
+
 	// Driver profile routes
 	router.HandleFunc("/api/v1/drivers", middleware.AuthMiddleware(handlers.ListDriverProfiles(db))).Methods("GET")
 	router.HandleFunc("/api/v1/drivers/{userID}", middleware.AuthMiddleware(handlers.GetDriverProfile(db))).Methods("GET")
 	router.HandleFunc("/api/v1/drivers/{userID}", middleware.AuthMiddleware(handlers.UpdateDriverProfile(db))).Methods("PUT")
 	router.HandleFunc("/api/v1/drivers/{userID}", middleware.AuthMiddleware(handlers.DeleteDriverProfile(db))).Methods("DELETE")
 	router.HandleFunc("/api/v1/drivers/{userID}/vehicle", middleware.AuthMiddleware(handlers.GetDriverVehicle(db))).Methods("GET")
+	router.HandleFunc("/api/v1/drivers/{userID}/performance", middleware.AuthMiddleware(handlers.GetDriverPerformance(db))).Methods("GET")
 
 	// Driver routes
 	router.HandleFunc("/api/v1/drivers/{userID}/orders", middleware.AuthMiddleware(handlers.GetDriverOrders(db))).Methods("GET")
+
+	// Fleet Manager routes
+	router.HandleFunc("/api/v1/fleet-manager/vehicles", middleware.AuthMiddleware(handlers.GetFleetVehicles(db))).Methods("GET")
+	router.HandleFunc("/api/v1/fleet-manager/performance", middleware.AuthMiddleware(handlers.GetFleetPerformance(db))).Methods("GET")
+	router.HandleFunc("/api/v1/fleet-manager/drivers", middleware.AuthMiddleware(handlers.GetFleetDrivers(db))).Methods("GET")
 
 	// Vehicle routes
 	router.HandleFunc("/api/v1/vehicles", handlers.ListVehicles(db)).Methods("GET")
