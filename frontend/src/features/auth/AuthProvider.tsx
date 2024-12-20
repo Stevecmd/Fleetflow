@@ -111,6 +111,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Role-based navigation
       switch (decoded.role_name) {
+        case 'customer':
+          navigate('/dashboard/customer');
+          break;
         case 'driver':
           navigate('/dashboard/driver');
           break;
