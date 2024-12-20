@@ -123,9 +123,15 @@ func main() {
 	router.HandleFunc("/api/v1/drivers/{userID}", middleware.AuthMiddleware(handlers.UpdateDriverProfile(db))).Methods("PUT")
 	router.HandleFunc("/api/v1/drivers/{userID}", middleware.AuthMiddleware(handlers.DeleteDriverProfile(db))).Methods("DELETE")
 	router.HandleFunc("/api/v1/drivers/{userID}/vehicle", middleware.AuthMiddleware(handlers.GetDriverVehicle(db))).Methods("GET")
+	router.HandleFunc("/api/v1/drivers/{userID}/performance", middleware.AuthMiddleware(handlers.GetDriverPerformance(db))).Methods("GET")
 
 	// Driver routes
 	router.HandleFunc("/api/v1/drivers/{userID}/orders", middleware.AuthMiddleware(handlers.GetDriverOrders(db))).Methods("GET")
+
+	// Fleet Manager routes
+	router.HandleFunc("/api/v1/fleet-manager/vehicles", middleware.AuthMiddleware(handlers.GetFleetVehicles(db))).Methods("GET")
+	router.HandleFunc("/api/v1/fleet-manager/performance", middleware.AuthMiddleware(handlers.GetFleetPerformance(db))).Methods("GET")
+	router.HandleFunc("/api/v1/fleet-manager/drivers", middleware.AuthMiddleware(handlers.GetFleetDrivers(db))).Methods("GET")
 
 	// Vehicle routes
 	router.HandleFunc("/api/v1/vehicles", handlers.ListVehicles(db)).Methods("GET")
