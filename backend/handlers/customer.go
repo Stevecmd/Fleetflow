@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/stevecmd/Fleetflow/backend/models"
 	"github.com/stevecmd/Fleetflow/backend/pkg/constants"
 )
@@ -75,19 +74,27 @@ func GetCustomerDeliveries(db *sql.DB) http.HandlerFunc {
 
 func GetCustomerInvoices(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		userID := vars["userID"]
+		// Get user ID from context
+		userID, ok := r.Context().Value(constants.UserIDKey).(int)
+		if !ok {
+			log.Printf("Failed to get userID from context")
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
 		query := `
-            SELECT id, delivery_id, amount, status, due_date, payment_method
-            FROM invoices
-            WHERE user_id = $1
-            ORDER BY created_at DESC
+            SELECT i.id, i.delivery_id, i.amount, i.status, 
+                   i.due_date, i.payment_method
+            FROM invoices i
+            JOIN deliveries d ON i.delivery_id = d.id
+            WHERE d.user_id = $1
+            ORDER BY i.created_at DESC
         `
 
 		rows, err := db.Query(query, userID)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("Database error: %v", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
 			return
 		}
 		defer rows.Close()
@@ -95,11 +102,13 @@ func GetCustomerInvoices(db *sql.DB) http.HandlerFunc {
 		var invoices []models.Invoice
 		for rows.Next() {
 			var i models.Invoice
-			err := rows.Scan(&i.ID, &i.DeliveryID, &i.Amount,
-				&i.Status, &i.DueDate, &i.PaymentMethod)
+			err := rows.Scan(
+				&i.ID, &i.DeliveryID, &i.Amount,
+				&i.Status, &i.DueDate, &i.PaymentMethod,
+			)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+				log.Printf("Row scan error: %v", err)
+				continue
 			}
 			invoices = append(invoices, i)
 		}
@@ -111,20 +120,28 @@ func GetCustomerInvoices(db *sql.DB) http.HandlerFunc {
 
 func GetCustomerFeedback(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		userID := vars["userID"]
+		// Get user ID from context using constants
+		userID, ok := r.Context().Value(constants.UserIDKey).(int)
+		if !ok {
+			log.Printf("Failed to get userID from context")
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
 
+		// Query feedback with proper JOIN
 		query := `
-            SELECT id, delivery_id, rating, feedback_text, 
-                   timeliness_rating, driver_rating, package_condition_rating
-            FROM delivery_feedback
-            WHERE user_id = $1
-            ORDER BY created_at DESC
+            SELECT f.id, f.delivery_id, f.rating, f.feedback_text, 
+                   f.timeliness_rating, f.driver_rating, f.package_condition_rating
+            FROM delivery_feedback f
+            JOIN deliveries d ON f.delivery_id = d.id
+            WHERE d.user_id = $1
+            ORDER BY f.created_at DESC
         `
 
 		rows, err := db.Query(query, userID)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("Database error: %v", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
 			return
 		}
 		defer rows.Close()
@@ -136,8 +153,8 @@ func GetCustomerFeedback(db *sql.DB) http.HandlerFunc {
 				&f.FeedbackText, &f.TimelinessRating,
 				&f.DriverRating, &f.PackageConditionRating)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
+				log.Printf("Row scan error: %v", err)
+				continue
 			}
 			feedback = append(feedback, f)
 		}

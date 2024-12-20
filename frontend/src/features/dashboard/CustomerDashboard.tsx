@@ -122,16 +122,17 @@ interface Delivery {
                                 ))}
                             </div>
                         </div>
-
+                        
+                        {/* Feedback Section */}
                         {/* Only show these sections if data is available */}
-                        {feedback.length > 0 && (
+                        {feedback && feedback.length > 0 && (
                             <div className="bg-white rounded-lg shadow p-6">
                                 <h2 className="text-xl font-semibold mb-4">Feedback History</h2>
                                 {/* Add feedback display */}
                             </div>
                         )}
 
-                        {invoices.length > 0 && (
+                        {invoices && invoices.length > 0 && (
                             <div className="bg-white rounded-lg shadow p-6">
                                 <h2 className="text-xl font-semibold mb-4">Invoices</h2>
                                 {/* Add invoices display */}
