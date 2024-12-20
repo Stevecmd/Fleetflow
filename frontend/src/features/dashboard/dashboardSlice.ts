@@ -96,6 +96,30 @@ export const fetchDriverPerformance = createAsyncThunk(
   }
 );
 
+export const fetchFleetVehicles = createAsyncThunk(
+  'dashboard/fetchFleetVehicles',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/fleet-manager/vehicles');
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch fleet vehicles');
+    }
+  }
+);
+
+export const fetchFleetPerformance = createAsyncThunk(
+  'dashboard/fetchFleetPerformance',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/fleet-manager/performance');
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch fleet performance');
+    }
+  }
+);
+
 // Reducers
 const dashboardSlice = createSlice({
   name: 'dashboard',

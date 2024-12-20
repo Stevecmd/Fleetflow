@@ -4,7 +4,7 @@ import { AppDispatch } from '../../store';
 import { RootState } from '../../store';
 import VehicleStats from './components/VehicleStats';
 import DriverPerformance from './DriverPerformance';
-import { fetchVehicleStats, fetchDriverPerformance } from './dashboardSlice';
+import { fetchFleetVehicles, fetchFleetPerformance } from './dashboardSlice';
 
 const FleetManagerDashboard: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -17,8 +17,8 @@ const FleetManagerDashboard: React.FC = () => {
 
   useEffect(() => {
     if (user?.id) {
-      dispatch(fetchVehicleStats(user.id));
-      dispatch(fetchDriverPerformance(user.id));
+      dispatch(fetchFleetVehicles());
+      dispatch(fetchFleetPerformance());
     }
   }, [dispatch, user?.id]);
 
