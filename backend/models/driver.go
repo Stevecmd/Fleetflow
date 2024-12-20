@@ -8,6 +8,10 @@ import (
 type DriverProfile struct {
 	ID               int        `json:"id"`
 	UserID           int        `json:"user_id"`
+    FirstName        string     `json:"first_name"`     
+    LastName         string     `json:"last_name"`     
+    Email            string     `json:"email"`          
+    AssignedVehicle  string     `json:"assigned_vehicle"`
 	LicenseNumber    string     `json:"license_number"`
 	LicenseType      string     `json:"license_type"`
 	LicenseExpiry    *time.Time `json:"license_expiry,omitempty"`

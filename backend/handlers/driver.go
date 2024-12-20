@@ -425,3 +425,56 @@ func GetDriverOrders(db *sql.DB) http.HandlerFunc {
 		json.NewEncoder(w).Encode(orders)
 	}
 }
+
+// GetDriverPerformance retrieves performance metrics for a specific driver
+func GetDriverPerformance(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		userID := vars["userID"]
+
+		userIDInt, err := strconv.Atoi(userID)
+		if err != nil {
+			http.Error(w, "Invalid user ID", http.StatusBadRequest)
+			return
+		}
+
+		// Query performance metrics
+		query := `
+            SELECT 
+                total_deliveries,
+                on_time_deliveries,
+                avg_rating,
+                total_distance
+            FROM driver_performance_metrics
+            WHERE user_id = $1
+            ORDER BY created_at DESC
+            LIMIT 1
+        `
+
+		var performance struct {
+			TotalDeliveries  int     `json:"total_deliveries"`
+			OnTimeDeliveries int     `json:"on_time_deliveries"`
+			AvgRating        float64 `json:"avg_rating"`
+			TotalDistance    float64 `json:"total_distance"`
+		}
+
+		err = db.QueryRow(query, userIDInt).Scan(
+			&performance.TotalDeliveries,
+			&performance.OnTimeDeliveries,
+			&performance.AvgRating,
+			&performance.TotalDistance,
+		)
+
+		if err == sql.ErrNoRows {
+			http.Error(w, "Performance data not found", http.StatusNotFound)
+			return
+		}
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(performance)
+	}
+}
