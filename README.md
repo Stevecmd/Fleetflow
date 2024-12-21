@@ -89,7 +89,7 @@ npm run dev
 ```bash
 # Create database and run migrations
 cd backend/db/init
-psql -U postgres -f 01-init.sql
+psql -U postgres -f schema.sql
 ```
 
 ## 🔒 Environment Variables
