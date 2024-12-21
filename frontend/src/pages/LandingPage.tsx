@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Logo from './../assets/logo.svg';
+
 const LandingPage: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -74,23 +75,23 @@ const LandingPage: React.FC = () => {
             <section id="features" className="py-20">
                 <h2 className="text-3xl font-bold text-center text-gray-900">Our Features</h2>
                 <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div className="bg-white p-6 rounded-lg shadow">
+                    <div className="bg-white p-6 rounded-lg shadow feature-card">
                         <h3 className="text-xl font-semibold">Driver Management</h3>
                         <p className="mt-2 text-gray-600">Manage driver profiles, track performance, and ensure compliance.</p>
                     </div>
-                    <div className="bg-white p-6 rounded-lg shadow">
+                    <div className="bg-white p-6 rounded-lg shadow feature-card">
                         <h3 className="text-xl font-semibold">Vehicle Fleet Management</h3>
                         <p className="mt-2 text-gray-600">Track vehicle status, maintenance schedules, and analytics.</p>
                     </div>
-                    <div className="bg-white p-6 rounded-lg shadow">
+                    <div className="bg-white p-6 rounded-lg shadow feature-card">
                         <h3 className="text-xl font-semibold">Delivery Operations</h3>
                         <p className="mt-2 text-gray-600">Optimize routes and track deliveries in real-time.</p>
                     </div>
-                    <div className="bg-white p-6 rounded-lg shadow">
+                    <div className="bg-white p-6 rounded-lg shadow feature-card">
                         <h3 className="text-xl font-semibold">Warehouse Management</h3>
                         <p className="mt-2 text-gray-600">Monitor inventory and coordinate loading/unloading.</p>
                     </div>
-                    <div className="bg-white p-6 rounded-lg shadow">
+                    <div className="bg-white p-6 rounded-lg shadow feature-card">
                         <h3 className="text-xl font-semibold">User Roles</h3>
                         <p className="mt-2 text-gray-600">Manage access and permissions for different user roles.</p>
                     </div>
