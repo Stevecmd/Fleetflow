@@ -60,12 +60,14 @@ const LandingPage: React.FC = () => {
                 </div>
             </nav>
             {/* Hero Section */}
-            <section className="text-center py-20">
-                <h1 className="text-4xl font-bold text-gray-900">Revolutionize Your Fleet Management</h1>
-                <p className="mt-4 text-lg text-gray-600">Efficient, Reliable, and User-Friendly Solutions</p>
-                <a href="#features" className="mt-6 inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
-                    Get Started
-                </a>
+            <section className="text-center py-20 bg-hero">
+                <div className="bg-black bg-opacity-45 p-6 rounded-lg inline-block">
+                    <h1 className="text-4xl font-bold text-white">Revolutionize Your Fleet Management</h1>
+                    <p className="mt-4 text-lg text-white">Efficient, Reliable, and User-Friendly Solutions</p>
+                    <a href="#features" className="mt-6 inline-block px-6 py-3 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition">
+                        Get Started
+                    </a>
+                </div>
             </section>
 
             {/* Features Section */}
@@ -95,8 +97,15 @@ const LandingPage: React.FC = () => {
                 </div>
             </section>
 
+            {/* About Section */}
+            <section id="about" className="py-20 bg-gray-100">
+                <h2 className="text-3xl font-bold text-center text-gray-900">About Us</h2>
+                <p className="mt-4 text-lg text-center text-gray-600">FleetFlow is dedicated to providing top-notch fleet management solutions.</p>
+                <p className="mt-2 text-center text-gray-600">Our mission is to help businesses optimize their fleet operations and improve efficiency.</p>
+            </section>
+
             {/* Call to Action Section */}
-            <section className="text-center py-20 bg-indigo-600 text-white">
+            <section id="contact" className="text-center py-20 bg-indigo-600 text-white">
                 <h2 className="text-3xl font-bold">Ready to Get Started?</h2>
                 <p className="mt-4">Join us today and take control of your fleet management.</p>
                 <a href="#contact" className="mt-6 inline-block px-6 py-3 bg-white text-indigo-600 rounded-lg shadow hover:bg-gray-200 transition">
