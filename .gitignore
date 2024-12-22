@@ -3,3 +3,4 @@ frontend/*/*.*:Zone.Identifier
 frontend/public/robots.txt
 frontend/*/*/*.*:Zone.Identifier
 node_modules/*
+frontend/*/*.*.Identifier
