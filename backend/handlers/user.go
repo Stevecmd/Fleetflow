@@ -10,6 +10,7 @@ import (
 
 	"github.com/stevecmd/Fleetflow/backend/models"
 	"github.com/stevecmd/Fleetflow/backend/pkg/constants"
+	"github.com/gorilla/mux"
 )
 
 // type contextKey string
@@ -312,4 +313,39 @@ func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Profile updated successfully"})
+}
+
+// DeleteUser handles DELETE /api/v1/users/{id}
+func DeleteUser(db *sql.DB) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        vars := mux.Vars(r)
+        userIDStr := vars["id"]
+        userID, err := strconv.Atoi(userIDStr)
+        if err != nil {
+            http.Error(w, "Invalid user ID", http.StatusBadRequest)
+            return
+        }
+
+        // Perform the deletion
+        result, err := db.Exec("DELETE FROM users WHERE id = $1", userID)
+        if err != nil {
+            log.Printf("Error deleting user with ID %d: %v", userID, err)
+            http.Error(w, "Error deleting user", http.StatusInternalServerError)
+            return
+        }
+
+        rowsAffected, err := result.RowsAffected()
+        if err != nil {
+            log.Printf("Error checking affected rows: %v", err)
+            http.Error(w, "Error checking affected rows", http.StatusInternalServerError)
+            return
+        }
+
+        if rowsAffected == 0 {
+            http.Error(w, "User not found", http.StatusNotFound)
+            return
+        }
+
+        w.WriteHeader(http.StatusNoContent) // 204 No Content
+    }
 }

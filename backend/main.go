@@ -111,6 +111,7 @@ func main() {
 	router.HandleFunc("/api/v1/users", middleware.AuthMiddleware(handlers.ListUsers)).Methods("GET")
 	router.HandleFunc("/api/v1/users/{userID}", middleware.AuthMiddleware(handlers.GetUserProfile)).Methods("GET")
 	router.HandleFunc("/api/v1/users/{userID}", middleware.AuthMiddleware(handlers.UpdateUserProfile)).Methods("PUT")
+	router.HandleFunc("/api/v1/users/{id}", middleware.AuthMiddleware(handlers.DeleteUser(db))).Methods("DELETE")
 
 	// Customer routes
 	router.HandleFunc("/api/v1/users/{userID}/deliveries", middleware.AuthMiddleware(handlers.GetCustomerDeliveries(db))).Methods("GET")
