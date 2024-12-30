@@ -10,6 +10,18 @@ import DriverStats from './components/DriverStats';
 import DriverPerformance from './DriverPerformance';
 import { fetchVehicleStats, fetchOrders } from './dashboardSlice';
 
+/**
+ * The DriverDashboard component displays the driver's dashboard with their vehicle stats, latest orders,
+ * delivery tracking, driver stats, and performance.
+ *
+ * The component fetches the vehicle stats and orders when the user is authenticated.
+ *
+ * If an error occurs during the fetch, the component displays an error message with a retry button.
+ * If the fetch is successful, the component displays the vehicle stats, latest orders, delivery tracking,
+ * driver stats, and performance.
+ *
+ * @returns The DriverDashboard component.
+ */
 const DriverDashboard: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { user } = useAuth();

@@ -125,6 +125,15 @@ const dashboardSlice = createSlice({
   name: 'dashboard',
   initialState,
   reducers: {
+/**
+ * Resets the dashboard state to its initial values.
+ * 
+ * This function clears all the data related to the dashboard,
+ * including vehicle statistics, orders, delivery stats,
+ * loading state, error messages, roles, and driver performance.
+ * It is typically used when the dashboard needs to be reset.
+ */
+
     clearDashboard: (state) => {
       state.vehicleStats = null;
       state.orders = [];
@@ -144,6 +153,44 @@ const dashboardSlice = createSlice({
       state.currentUserRole = action.payload;
     },
   },
+  /**
+   * This is an object that maps action types to reducers.
+   * When an action is dispatched, the corresponding reducer
+   * is called with the current state and the action payload.
+   * The reducer should return a new state.
+   *
+   * The extraReducers property is used to add additional
+   * reducers that are not part of the initial state.
+   *
+   * In this case, we are adding reducers for the following
+   * actions:
+   * - fetchVehicleStats.fulfilled
+   * - fetchVehicleStats.pending
+   * - fetchVehicleStats.rejected
+   * - fetchOrders.fulfilled
+   * - fetchOrders.pending
+   * - fetchOrders.rejected
+   * - fetchDriverPerformance.fulfilled
+   * - fetchDriverPerformance.pending
+   * - fetchDriverPerformance.rejected
+   *
+   * The reducers are called in the following order:
+   * - fetchVehicleStats.fulfilled
+   * - fetchOrders.fulfilled
+   * - fetchDriverPerformance.fulfilled
+   * - fetchVehicleStats.pending
+   * - fetchOrders.pending
+   * - fetchDriverPerformance.pending
+   * - fetchVehicleStats.rejected
+   * - fetchOrders.rejected
+   * - fetchDriverPerformance.rejected
+   *
+   * If any of the reducers return a new state, the state
+   * is updated with the new state.
+   *
+   * If any of the reducers throw an error, the error is
+   * caught and the state is not updated.
+   */
   extraReducers: (builder) => {
     builder.addCase(fetchVehicleStats.fulfilled, (state, action) => {
       state.vehicleStats = action.payload;

@@ -35,6 +35,26 @@ interface Delivery {
     payment_method?: string;
   }
 
+/**
+ * CustomerDashboard component displays the dashboard for a logged-in customer.
+ * It fetches and displays the customer's active deliveries, feedback history, and invoices.
+ * 
+ * State:
+ * - deliveries: Array of active deliveries for the customer.
+ * - invoices: Array of invoices related to the customer's deliveries.
+ * - feedback: Array of feedback related to the deliveries.
+ * - loading: Boolean indicating if data is being fetched.
+ * - error: Error message if data fetching fails.
+ * 
+ * Effects:
+ * - Fetches customer data (deliveries, feedback, invoices) on component mount or when user ID changes.
+ * 
+ * Conditional Rendering:
+ * - Shows loading indicator while fetching data.
+ * - Shows error message if fetching fails.
+ * - Displays deliveries, feedback, and invoices if available.
+ */
+
   const CustomerDashboard: React.FC = () => {
     const { user } = useAuth();
     const [deliveries, setDeliveries] = useState<Delivery[]>([]);

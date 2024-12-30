@@ -5,6 +5,15 @@ interface VehicleStatsProps {
   data: VehicleData | null;
 }
 
+/**
+ * A component that displays vehicle statistics.
+ *
+ * If the vehicle data is null, it displays a skeleton UI.
+ *
+ * @param {VehicleData | null} data The vehicle data to display.
+ *
+ * @returns A JSX element that displays the vehicle statistics.
+ */
 const VehicleStats: React.FC<VehicleStatsProps> = ({ data }) => {
   if (!data) {
     return (

@@ -11,6 +11,11 @@ interface Delivery {
   };
 }
 
+/**
+ * TrackingDelivery component displays the details of a delivery.
+ *
+ * @returns {ReactElement} A ReactElement representing the TrackingDelivery component.
+ */
 const TrackingDelivery: React.FC = () => {
   const delivery: Delivery = {
     from: {

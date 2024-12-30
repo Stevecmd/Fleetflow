@@ -3,6 +3,14 @@ import { AppDispatch, RootState } from '../../store';
 import DriverDashboard from './DriverDashboard';
 import FleetManagerDashboard from './FleetManagerDashboard';
 
+/**
+ * Dashboard component that renders the main dashboard view.
+ * It displays a welcome message and conditionally renders either
+ * the DriverDashboard or FleetManagerDashboard based on the current user role.
+ *
+ * Uses Redux to dispatch actions and select the current role from the store.
+ */
+
 const Dashboard: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const currentRole = useSelector((state: RootState) => state.dashboard.currentRole);

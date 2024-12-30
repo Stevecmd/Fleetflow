@@ -11,6 +11,16 @@ interface DriverPerformanceProps {
   performance: DeliveryStats | null;
 }
 
+/**
+ * Displays driver performance metrics, including total deliveries completed,
+ * on-time delivery rate, unloading time, and waiting time.
+ *
+ * @param {DeliveryStats | null} performance - an object containing the driver's
+ * performance metrics, or null if no data is available.
+ *
+ * @returns {React.ReactElement} a JSX element displaying the driver's performance
+ * metrics.
+ */
 const DriverPerformance: React.FC<DriverPerformanceProps> = ({ performance }) => {
   return (
     <div className="bg-white shadow rounded-lg p-6">
