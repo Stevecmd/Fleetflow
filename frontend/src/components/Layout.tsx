@@ -3,6 +3,18 @@ import { Outlet, Link } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthProvider';
 import Logo from '../assets/logo.svg';
 
+/**
+ * The main layout component for the app.
+ *
+ * This component renders the main layout structure for the app, including the
+ * navigation bar and the main content area.
+ *
+ * The navigation bar contains a link to the login page if the user is not
+ * authenticated, and a logout button if the user is authenticated.
+ *
+ * The main content area renders the child route component, which is passed in
+ * as a prop from the parent route.
+ */
 const Layout: React.FC = () => {
   const { isAuthenticated, logout } = useAuth();
 

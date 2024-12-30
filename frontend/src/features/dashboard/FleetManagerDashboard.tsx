@@ -6,6 +6,14 @@ import VehicleStats from './components/VehicleStats';
 import DriverPerformance from './DriverPerformance';
 import { fetchFleetVehicles, fetchFleetPerformance } from './dashboardSlice';
 
+/**
+ * FleetManagerDashboard is a React functional component that displays the dashboard
+ * for fleet managers. It fetches and displays data related to fleet vehicles and
+ * driver performance. The component uses Redux to manage state and dispatches 
+ * actions to fetch vehicle and performance data when the component mounts. It 
+ * handles loading and error states by displaying appropriate UI feedback.
+ */
+
 const FleetManagerDashboard: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const { loading, error, vehicleStats, driverPerformance, user } = useSelector(

@@ -14,6 +14,33 @@ interface DriverStatsProps {
   data: DeliveryStats | null;
 }
 
+/**
+ * Component that displays driver performance statistics.
+ * 
+ * This component takes `DriverStatsProps` which contains delivery statistics, 
+ * and visualizes them both numerically and in a bar chart format.
+ * 
+ * If no data is provided, a loading skeleton is displayed.
+ * The statistics include on-time delivery rate, unloading time, 
+ * and waiting time, each represented as a percentage of total deliveries.
+ * 
+ * @param {DriverStatsProps} props - The properties containing delivery statistics.
+ * @returns A React component displaying the driver's performance stats.
+ */
+
+/**
+ * Component that displays driver performance statistics.
+ * 
+ * This component takes `DriverStatsProps` which contains delivery statistics, 
+ * and visualizes them both numerically and in a bar chart format.
+ * 
+ * If no data is provided, a loading skeleton is displayed.
+ * The statistics include on-time delivery rate, unloading time, 
+ * and waiting time, each represented as a percentage of total deliveries.
+ * 
+ * @param {DriverStatsProps} props - The properties containing delivery statistics.
+ * @returns A React component displaying the driver's performance stats.
+ */
 const DriverStats: React.FC<DriverStatsProps> = ({ data }) => {
   if (!data) {
     return (

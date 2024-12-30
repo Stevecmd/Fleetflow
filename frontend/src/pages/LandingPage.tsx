@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import Logo from './../assets/logo.svg';
 
+/**
+ * The LandingPage component renders the main landing page of the application.
+ * It includes a navigation bar with links to the features, about, and contact pages.
+ * It also includes a hero section, a features section, an about section, a call to action section, and a footer.
+ */
 const LandingPage: React.FC = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 

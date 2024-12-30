@@ -12,6 +12,14 @@ interface LatestOrdersProps {
   data: Order[];
 }
 
+/**
+ * A component that displays a list of the latest orders.
+ * If there are no orders, it displays a skeleton loader.
+ *
+ * @param {LatestOrdersProps} props
+ * @prop {Order[]} data - An array of orders to display
+ * @returns {React.ReactElement} A React element representing the latest orders
+ */
 const LatestOrders: React.FC<LatestOrdersProps> = ({ data }) => {
   if (!data || data.length === 0) {
     return (

@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../auth/AuthProvider';
 import { api } from '../../services/api'; // Import the api instance
 
+/**
+ * The admin dashboard component.
+ *
+ * This component displays a table of all users in the system, and a form to register a new user.
+ * It also displays a message indicating whether the user registration was successful or not.
+ *
+ * @returns The admin dashboard component.
+ */
 const AdminDashboard: React.FC = () => {
     const { user } = useAuth();
     const [newUser, setNewUser] = useState({
@@ -20,6 +28,11 @@ const AdminDashboard: React.FC = () => {
         fetchUsers();
     }, []);
 
+/**
+ * Fetches the list of users from the API and updates the state.
+ * If an error occurs during the fetch operation, it logs the error to the console.
+ */
+
     const fetchUsers = async () => {
         try {
             const response = await api.get('/users'); // Use the api instance
@@ -29,11 +42,19 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
+    /**
+     * Handles input changes in the registration form.
+     * @param {React.ChangeEvent<HTMLInputElement>} e The input change event.
+     */
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setNewUser({ ...newUser, [name]: value });
     };
 
+    /**
+     * Handles the form submission and registers a new user.
+     * @param {React.FormEvent} e The form submission event.
+     */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log('Registering user:', newUser);
@@ -52,6 +73,10 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
+    /**
+     * Deletes a user with the given ID and refreshes the user list.
+     * @param {number} userId The ID of the user to delete.
+     */
     const handleDelete = async (userId: number) => {
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
         if (window.confirm('Are you sure you want to delete this user?')) {

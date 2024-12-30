@@ -25,6 +25,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+/**
+ * Provides authentication state and functions to the application.
+ *
+ * The AuthProvider is a React context provider that wraps the entire application.
+ * It provides the authentication state and functions to log in, log out, and
+ * refresh the authentication token.
+ *
+ * The AuthProvider uses the Redux store to manage the authentication state. It
+ * also uses the api service to make requests to the authentication endpoints.
+ *
+ * The AuthProvider is responsible for:
+ *
+ * - Managing the authentication state in the Redux store.
+ * - Providing the login function to log in to the application.
+ * - Providing the logout function to log out of the application.
+ * - Refreshing the authentication token periodically.
+ * - Updating the authentication state in the Redux store when the token is refreshed.
+ *
+ * The AuthProvider is used in the App component to wrap the entire application.
+ * It is also used in the Login and Logout components to access the authentication
+ * state and functions.
+ */
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -60,6 +82,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => clearInterval(refreshInterval);
   }, [isAuthenticated, refreshToken, refreshAuthToken]);
 
+/**
+ * Logs in a user by dispatching a login start action, making an API request
+ * to the authentication endpoint, and handling the response.
+ *
+ * - Sends a POST request to the '/auth/login' endpoint with the provided
+ *   identifier and password.
+ * - If successful, processes the response to extract the access token,
+ *   refresh token, and user information. Decodes the token to determine
+ *   the user's role.
+ * - Updates the Redux store with the login success action, storing user
+ *   and token data, and navigates to the appropriate dashboard based on
+ *   the user's role.
+ * - Handles login errors by dispatching a login failure action with an
+ *   error message.
+ *
+ * @param {Object} credentials - The login credentials.
+ * @param {string} credentials.identifier - The user's identifier (username or email).
+ * @param {string} credentials.password - The user's password.
+ *
+ * @returns {Promise<void>} A promise that resolves when the login process is complete.
+ */
+
+  /**
+   * Logs in a user by dispatching a login start action, making an API request
+   * to the authentication endpoint, and handling the response.
+   *
+   * - Sends a POST request to the '/auth/login' endpoint with the provided
+   *   identifier and password.
+   * - If successful, processes the response to extract the access token,
+   *   refresh token, and user information. Decodes the token to determine
+   *   the user's role.
+   * - Updates the Redux store with the login success action, storing user
+   *   and token data, and navigates to the appropriate dashboard based on
+   *   the user's role.
+   * - Handles login errors by dispatching a login failure action with an
+   *   error message.
+   *
+   * @param {Object} credentials - The login credentials.
+   * @param {string} credentials.identifier - The user's identifier (username or email).
+   * @param {string} credentials.password - The user's password.
+   *
+   * @returns {Promise<void>} A promise that resolves when the login process is complete.
+   */
   const login = async ({ identifier, password }: { identifier: string; password: string }) => {
     dispatch(loginStart());
     try {
@@ -212,6 +277,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
+/**
+ * Hook to access the `AuthContext` state and functions.
+ *
+ * Throws an error if used outside of an `AuthProvider`.
+ *
+ * @returns The `AuthContextType` object containing:
+ *  - `isAuthenticated`: A boolean indicating whether the user is authenticated.
+ *  - `loading`: A boolean indicating whether an authentication request is in progress.
+ *  - `error`: An error message if the authentication request failed.
+ *  - `user`: The authenticated user object, if any.
+ *  - `login`: A function to authenticate a user.
+ *  - `logout`: A function to log out the current user.
+ */
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {

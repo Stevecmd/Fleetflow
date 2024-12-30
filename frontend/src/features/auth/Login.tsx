@@ -1,11 +1,26 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthProvider';
 
+  /**
+   * Page for signing in to FleetFlow.
+   *
+   * This page uses the {@link useAuth} hook to get the `login` function and
+   * loading/error state. It displays a form with fields for the identifier and
+   * password, and a submit button. When the form is submitted, it calls `login`
+   * with the user's input.
+   *
+   * If an error occurs during login, it is displayed above the form.
+   */
 const Login: React.FC = () => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const { login, loading, error } = useAuth();
 
+  /**
+   * Handles form submission by calling the `login` function with the user's
+   * input. Prevents the default form submission behavior, and catches any
+   * errors that occur during login (they are handled by the `AuthProvider`).
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {

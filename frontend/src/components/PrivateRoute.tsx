@@ -6,6 +6,16 @@ interface PrivateRouteProps {
   children: React.ReactNode;
 }
 
+/**
+ * A Route that redirects to the login page if the user is not authenticated.
+ *
+ * The component will render a "Loading..." message if the authentication status is still loading.
+ *
+ * @example
+ * <PrivateRoute>
+ *   <ProtectedComponent />
+ * </PrivateRoute>
+ */
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
