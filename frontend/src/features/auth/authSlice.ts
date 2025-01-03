@@ -25,12 +25,20 @@ const getUserFromStorage = () => {
   const token = localStorage.getItem('accessToken');
 
   if (storedUser && token) {
-    const user = JSON.parse(storedUser);
-    const decoded: any = jwtDecode(token);
-    return {
-      ...user,
-      role: decoded.role_name
-    };
+    try {
+      const user = JSON.parse(storedUser);
+      const decoded: any = jwtDecode(token);
+      return {
+        ...user,
+        role: decoded.role_name
+      };
+    } catch (error) {
+      console.error('Invalid token:', error);
+      localStorage.removeItem('user');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      return null;
+    }
   }
   return null;
 };
