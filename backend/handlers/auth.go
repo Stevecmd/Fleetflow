@@ -78,6 +78,17 @@ func generateTokenPair(userID int, username string, roleName string) (*TokenPair
 	}, nil
 }
 
+// LoginHandler godoc
+// @Summary Login a user
+// @Description Authenticate a user and return a JWT token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param credentials body models.Credentials true "User credentials"
+// @Success 200 {object} models.TokenPair
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Router /auth/login [post]
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	var creds struct {
 		Username string `json:"username"`
