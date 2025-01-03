@@ -1,20 +1,12 @@
 # Dockerfile for Swagger
-FROM golang:1.22-alpine
+FROM swaggerapi/swagger-ui:latest
 
-# Install swag CLI tool
-RUN go install github.com/swaggo/swag/cmd/swag@latest
+# Copy the swagger.json file
+COPY backend/docs/swagger.json /usr/share/nginx/html/swagger.json
 
-# Set the working directory
-WORKDIR /app
+# Set environment variables for Swagger UI
+ENV SWAGGER_JSON=/usr/share/nginx/html/swagger.json
+ENV BASE_URL=/swagger
 
-# Copy the project files
-COPY . .
-
-# Generate Swagger documentation
-RUN swag init -g backend/main.go
-
-# Expose port 8080 for Swagger UI
+# Expose port 8080
 EXPOSE 8080
-
-# Start the Swagger UI server
-CMD ["swag", "serve", "-p", "8080"]
