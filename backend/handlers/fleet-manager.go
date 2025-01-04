@@ -23,6 +23,38 @@ type FleetVehicle struct {
 	LicenseNumber *string `json:"license_number,omitempty"`
 }
 
+// GetFleetVehicles retrieves all the vehicles in the fleet, along with their current
+// driver and license number (if applicable).
+//
+// The response is a JSON array of FleetVehicle objects, with the following fields:
+//
+// - id
+// - plate_number
+// - type
+// - make
+// - model
+// - year
+// - capacity
+// - fuel_type
+// - status_id
+// - gps_unit_id
+// - last_maintenance
+// - next_maintenance
+// - mileage
+// - insurance_expiry
+// - current_location_latitude
+// - current_location_longitude
+// - current_location_updated_at
+// - fuel_efficiency_rating
+// - total_fuel_consumption
+// - total_maintenance_cost
+// - vehicle_images
+// - registration_document_image_url
+// - insurance_document_image_url
+// - created_at
+// - updated_at
+// - driver_id (optional)
+// - license_number (optional)
 func GetFleetVehicles(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := `
@@ -86,6 +118,13 @@ func GetFleetVehicles(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// GetFleetPerformance retrieves aggregate performance metrics for the fleet,
+// including the total number of vehicles, total number of drivers, average
+// driver rating, and total number of deliveries. It executes a SQL query to
+// calculate these metrics and returns the data as a JSON response. If an error
+// occurs during the query, it logs the error and sends a 500 Internal Server
+// Error response.
+
 func GetFleetPerformance(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Starting GetFleetPerformance")
@@ -120,6 +159,11 @@ func GetFleetPerformance(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// GetFleetDrivers retrieves a list of all drivers in the fleet, along with
+// their profile information and the vehicle they are currently assigned to.
+// It executes a SQL query to retrieve the data and returns the list of
+// drivers as a JSON response. If an error occurs during the query, it logs
+// the error and sends a 500 Internal Server Error response.
 func GetFleetDrivers(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := `

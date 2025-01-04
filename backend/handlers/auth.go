@@ -25,6 +25,13 @@ type TokenPair struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+// validatePassword ensures that a given password is valid according to the following rules:
+// - At least 8 characters long
+// - Contains at least one uppercase letter
+// - Contains at least one lowercase letter
+// - Contains at least one number
+// - Contains at least one special character (!@#$%^&*)
+// Returns an error if the password does not satisfy any of the above criteria.
 func validatePassword(password string) error {
 	if len(password) < 8 {
 		return fmt.Errorf("password must be at least 8 characters long")
@@ -43,6 +50,12 @@ func validatePassword(password string) error {
 	}
 	return nil
 }
+
+// generateTokenPair generates a pair of JWT tokens: an access token and a refresh token.
+// The access token includes claims for the user ID, username, and role name, and expires in 15 minutes.
+// The refresh token includes claims for the user ID and username, and expires in 7 days.
+// Both tokens are signed using the HS256 signing method.
+// The function returns a TokenPair containing the signed token strings, or an error if signing fails.
 
 func generateTokenPair(userID int, username string, roleName string) (*TokenPair, error) {
 	// Generate access token
@@ -149,6 +162,17 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// @Summary Register a new user
+// @Description Registers a new user with the provided information.
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param user body models.User true "User information"
+// @Success 201 {object} models.TokenPair
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 409 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /auth/register [post]
 func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	var newUser models.User
 
@@ -294,6 +318,15 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tokenPair)
 }
 
+// LogoutHandler godoc
+// @Summary Logout a user
+// @Description Revoke an access token by adding it to the blacklist
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.MessageResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Router /auth/logout [post]
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	// Get the token from Authorization header
 	authHeader := r.Header.Get("Authorization")
@@ -315,6 +348,17 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"message": "Successfully logged out"})
 }
 
+// RefreshTokenHandler godoc
+// @Summary Refresh a user's access token
+// @Description Use a valid refresh token to obtain a new access token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param refresh_token body string true "Refresh token"
+// @Success 200 {object} models.TokenPair
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Router /auth/refresh [post]
 func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	var refreshRequest struct {
 		RefreshToken string `json:"refresh_token"`

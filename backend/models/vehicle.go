@@ -1,5 +1,7 @@
 package models
 
+// Vehicle represents a vehicle in the system
+
 import (
 	"time"
 )

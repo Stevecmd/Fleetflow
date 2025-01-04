@@ -1,5 +1,7 @@
 package repository
 
+// WarehouseRepository handles database operations for warehouses
+
 import (
 	"database/sql"
 	"errors"

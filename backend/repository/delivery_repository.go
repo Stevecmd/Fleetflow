@@ -1,5 +1,7 @@
 package repository
 
+// DeliveryRepository handles database operations for deliveries
+
 import (
 	"database/sql"
 	"encoding/json"

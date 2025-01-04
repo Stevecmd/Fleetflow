@@ -1,6 +1,6 @@
 package models
 
-// Other model definitions...
+// DeliveryFeedback represents a feedback for a delivery
 
 type DeliveryFeedback struct {
 	ID int `json:"id"`

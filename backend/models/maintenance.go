@@ -7,6 +7,7 @@ import (
 )
 
 // MaintenanceRecord represents a vehicle maintenance record
+
 type MaintenanceRecord struct {
 	ID              int       `json:"id"`
 	VehicleID       int       `json:"vehicle_id"`
