@@ -41,6 +41,8 @@ services:
       - "8080:8080"
     volumes:
       - ./backend/docs:/usr/share/nginx/html
+      - ./backend/docs/swagger.json:/usr/share/nginx/html/swagger.json
+      - ./backend/docs/swagger-initializer.js:/usr/share/nginx/html/swagger-initializer.js
     environment:
       SWAGGER_JSON: /usr/share/nginx/html/swagger.json
     networks:
