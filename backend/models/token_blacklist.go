@@ -1,5 +1,7 @@
 package models
 
+// TokenBlacklist represents a list of blacklisted tokens
+
 import (
 	"sync"
 	"time"

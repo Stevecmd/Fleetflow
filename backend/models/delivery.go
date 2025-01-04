@@ -5,6 +5,7 @@ import (
 )
 
 // Delivery represents a delivery record in the database
+
 type Delivery struct {
 	ID                      int64      `json:"id"`
 	FromLocation            string     `json:"from_location"`

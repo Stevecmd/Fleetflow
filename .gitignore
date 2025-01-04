@@ -4,3 +4,4 @@ frontend/public/robots.txt
 frontend/*/*/*.*:Zone.Identifier
 node_modules/*
 frontend/*/*.*.Identifier
+backend/docs/swagger-initializer.js.gz

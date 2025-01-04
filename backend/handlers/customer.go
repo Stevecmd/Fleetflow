@@ -10,6 +10,9 @@ import (
 	"github.com/stevecmd/Fleetflow/backend/pkg/constants"
 )
 
+// GetCustomerDeliveries returns a list of deliveries associated with the authenticated customer.
+// It verifies the user role and ensures that the deliveries belong to the user.
+// The results are ordered by the creation time in descending order.
 func GetCustomerDeliveries(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get user ID from context using constants
@@ -72,6 +75,9 @@ func GetCustomerDeliveries(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// GetCustomerInvoices returns a list of invoices associated with the authenticated user.
+// It performs a JOIN on the deliveries table to ensure that the invoices belong to the user.
+// The results are ordered by the creation time in descending order.
 func GetCustomerInvoices(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get user ID from context
@@ -118,6 +124,9 @@ func GetCustomerInvoices(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// GetCustomerFeedback returns a list of delivery feedback associated with the authenticated user.
+// It performs a JOIN on the deliveries table to ensure that the feedback belongs to the user.
+// The results are ordered by the creation time in descending order.
 func GetCustomerFeedback(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Get user ID from context using constants

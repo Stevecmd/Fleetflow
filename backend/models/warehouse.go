@@ -1,5 +1,7 @@
 package models
 
+// Warehouse represents a warehouse in the system
+
 import (
 	"encoding/json"
 	"time"

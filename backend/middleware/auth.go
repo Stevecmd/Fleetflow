@@ -14,6 +14,11 @@ import (
 var tokenBlacklist = make(map[string]bool)
 var JwtKey []byte
 
+// AuthMiddleware is an HTTP middleware that validates an authorization token.
+// If the token is valid and not revoked, it adds the user's ID, username, and role name to the request context.
+// The middleware returns http.StatusUnauthorized if the token is invalid, expired, or revoked.
+// The middleware returns http.StatusForbidden if the user is not authorized to access the endpoint.
+// The middleware logs token parsing and validation errors.
 func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")

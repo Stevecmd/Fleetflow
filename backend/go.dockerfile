@@ -1,5 +1,6 @@
-FROM golang:1.19-alpine
+FROM golang:1.22-alpine
 
+# Set the working directory
 WORKDIR /app
 
 # Install git for downloading dependencies
