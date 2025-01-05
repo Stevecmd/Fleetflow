@@ -438,39 +438,48 @@ func GetDriverPerformance(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Query performance metrics
+		// Updated query to get the latest performance metrics
 		query := `
             SELECT 
-                total_deliveries,
-                on_time_deliveries,
-                avg_rating,
-                total_distance
+                COALESCE(deliveries_completed, 0) as deliveries_completed,
+                COALESCE(on_time_delivery_rate, 0) as on_time_delivery_rate,
+                COALESCE(customer_rating_avg, 0) as customer_rating_avg,
+                COALESCE(fuel_efficiency, 0) as fuel_efficiency,
+                COALESCE(safety_score, 0) as safety_score,
+                COALESCE(total_distance_covered, 0) as total_distance_covered
             FROM driver_performance_metrics
             WHERE user_id = $1
-            ORDER BY created_at DESC
+            ORDER BY metric_date DESC
             LIMIT 1
         `
 
 		var performance struct {
-			TotalDeliveries  int     `json:"total_deliveries"`
-			OnTimeDeliveries int     `json:"on_time_deliveries"`
-			AvgRating        float64 `json:"avg_rating"`
-			TotalDistance    float64 `json:"total_distance"`
+			DeliveriesCompleted  int     `json:"deliveries_completed"`
+			OnTimeDeliveryRate   float64 `json:"on_time_delivery_rate"`
+			CustomerRatingAvg    float64 `json:"customer_rating_avg"`
+			FuelEfficiency       float64 `json:"fuel_efficiency"`
+			SafetyScore          float64 `json:"safety_score"`
+			TotalDistanceCovered float64 `json:"total_distance_covered"`
 		}
 
 		err = db.QueryRow(query, userIDInt).Scan(
-			&performance.TotalDeliveries,
-			&performance.OnTimeDeliveries,
-			&performance.AvgRating,
-			&performance.TotalDistance,
+			&performance.DeliveriesCompleted,
+			&performance.OnTimeDeliveryRate,
+			&performance.CustomerRatingAvg,
+			&performance.FuelEfficiency,
+			&performance.SafetyScore,
+			&performance.TotalDistanceCovered,
 		)
 
 		if err == sql.ErrNoRows {
-			http.Error(w, "Performance data not found", http.StatusNotFound)
+			// Return default values if no metrics found
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(performance)
 			return
 		}
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			log.Printf("Error querying performance metrics: %v", err)
+			http.Error(w, "Error retrieving performance metrics", http.StatusInternalServerError)
 			return
 		}
 

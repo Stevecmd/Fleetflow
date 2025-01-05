@@ -25,6 +25,39 @@ interface DashboardState {
   currentRole: string | null;
   currentUserRole: string | null;
   driverPerformance: any;
+  driverMetrics: DriverMetrics | null;
+  vehicleInfo: VehicleInfo | null;
+  deliveries: Delivery[];
+}
+
+interface DriverMetrics {
+  deliveries_completed: number;
+  on_time_delivery_rate: number;
+  customer_rating_avg: number;
+  fuel_efficiency: number;
+  safety_score: number;
+  total_distance_covered: number;
+}
+
+interface VehicleInfo {
+  plate_number: string;
+  type: string;
+  make: string;
+  model: string;
+  fuel_type: string;
+  status: string;
+  last_maintenance: string;
+  next_maintenance: string;
+}
+
+interface Delivery {
+  tracking_number: string;
+  status: string;
+  pickup_time: string;
+  delivery_time: string;
+  from_location: string;
+  cargo_type: string;
+  cargo_weight: number;
 }
 
 const initialState: DashboardState = {
@@ -41,6 +74,9 @@ const initialState: DashboardState = {
   currentRole: null,
   currentUserRole: null,
   driverPerformance: null,
+  driverMetrics: null,
+  vehicleInfo: null,
+  deliveries: [],
 };
 
 export interface VehicleData {
@@ -120,6 +156,42 @@ export const fetchFleetPerformance = createAsyncThunk(
   }
 );
 
+export const fetchDriverMetrics = createAsyncThunk(
+  'dashboard/fetchDriverMetrics',
+  async (userId: number, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/drivers/${userId}/performance`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch driver metrics');
+    }
+  }
+);
+
+export const fetchVehicleInfo = createAsyncThunk(
+  'dashboard/fetchVehicleInfo',
+  async (userId: number, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/drivers/${userId}/vehicle`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch vehicle info');
+    }
+  }
+);
+
+export const fetchDeliveries = createAsyncThunk(
+  'dashboard/fetchDeliveries',
+  async (userId: number, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/drivers/${userId}/orders`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch deliveries');
+    }
+  }
+);
+
 // Reducers
 const dashboardSlice = createSlice({
   name: 'dashboard',
@@ -148,6 +220,9 @@ const dashboardSlice = createSlice({
       state.currentRole = null;
       state.currentUserRole = null;
       state.driverPerformance = null;
+      state.driverMetrics = null;
+      state.vehicleInfo = null;
+      state.deliveries = [];
     },
     setUserRole(state, action) {
       state.currentUserRole = action.payload;
@@ -224,6 +299,19 @@ const dashboardSlice = createSlice({
       state.error = action.error.message ?? null;
       state.loading = false;
     });
+    builder
+      .addCase(fetchDriverMetrics.fulfilled, (state, action) => {
+        state.driverMetrics = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchVehicleInfo.fulfilled, (state, action) => {
+        state.vehicleInfo = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchDeliveries.fulfilled, (state, action) => {
+        state.deliveries = action.payload;
+        state.loading = false;
+      });
   },
 });
 
