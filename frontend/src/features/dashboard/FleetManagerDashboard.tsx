@@ -1,8 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
 import VehicleStats from './components/VehicleStats';
 import DriverPerformance from './DriverPerformance';
+
+// Create memoized selectors
+const selectDashboardState = (state: RootState) => state.dashboard;
+const selectAuthState = (state: RootState) => state.auth;
+
+const selectDashboardData = createSelector(
+  [selectDashboardState, selectAuthState],
+  (dashboard, auth) => ({
+    loading: dashboard.loading,
+    error: dashboard.error,
+    user: auth.user,
+  })
+);
 
 // Define the expected types for vehicle and driver performance data
 interface VehicleData {
@@ -48,76 +62,87 @@ interface DriverPerformanceData {
  * @returns The FleetManagerDashboard component.
  */
 const FleetManagerDashboard: React.FC = () => {
-  const { loading, error, user } = useSelector((state: RootState) => ({
-    loading: state.dashboard.loading,
-    error: state.dashboard.error,
-    user: state.auth.user,
-  }));
+  // Use memoized selector
+  const { loading, error, user } = useSelector(selectDashboardData);
 
   const [vehicleStats, setVehicleStats] = useState<VehicleData[]>([]);
   const [driverPerformance, setDriverPerformance] = useState<DriverPerformanceData[]>([]);
 
   useEffect(() => {
+    const dummyVehicleStats: VehicleData[] = [
+      { 
+        id: 1, 
+        plate_number: 'ABC123', 
+        type: 'Truck', 
+        make: 'Ford', 
+        model: 'F-150', 
+        year: 2020, 
+        status: 'Active', 
+        count: 10,
+        capacity: 2000,
+        fuel_type: 'Diesel',
+        status_id: 1,
+        mileage: 50000,
+        created_at: '2023-01-15T08:30:00Z',
+        updated_at: '2024-01-20T14:25:00Z'
+      },
+      { 
+        id: 2, 
+        plate_number: 'XYZ987', 
+        type: 'Van', 
+        make: 'Chevrolet', 
+        model: 'Express', 
+        year: 2019, 
+        status: 'Inactive', 
+        count: 5,
+        capacity: 1500,
+        fuel_type: 'Gasoline',
+        status_id: 2,
+        mileage: 75000,
+        created_at: '2023-02-20T09:15:00Z',
+        updated_at: '2024-01-19T16:45:00Z'
+      },
+      { 
+        id: 3, 
+        plate_number: 'LMN456', 
+        type: 'SUV', 
+        make: 'Toyota', 
+        model: 'Highlander', 
+        year: 2021, 
+        status: 'Maintenance', 
+        count: 3,
+        capacity: 1000,
+        fuel_type: 'Hybrid',
+        status_id: 3,
+        mileage: 25000,
+        created_at: '2023-03-10T10:45:00Z',
+        updated_at: '2024-01-18T11:30:00Z'
+      }
+    ];
+
+    const dummyDriverPerformance: DriverPerformanceData[] = [
+      { 
+        id: 1, 
+        driverName: 'Alice', 
+        performanceScore: 85, 
+        deliveryStats: { totalDeliveries: 50, onTime: 45, unloading: 3, waiting: 2 } 
+      },
+      { 
+        id: 2, 
+        driverName: 'Bob', 
+        performanceScore: 90, 
+        deliveryStats: { totalDeliveries: 60, onTime: 55, unloading: 2, waiting: 3 } 
+      },
+    ];
+
     if (user?.id) {
-      setVehicleStats([
-        { 
-          id: 1, 
-          plate_number: 'ABC123', 
-          type: 'Truck', 
-          make: 'Ford', 
-          model: 'F-150', 
-          year: 2020, 
-          status: 'Active', 
-          count: 10,
-          capacity: 2000,
-          fuel_type: 'Diesel',
-          status_id: 1,
-          mileage: 50000,
-          created_at: '2023-01-15T08:30:00Z',
-          updated_at: '2024-01-20T14:25:00Z'
-        },
-        { 
-          id: 2, 
-          plate_number: 'XYZ987', 
-          type: 'Van', 
-          make: 'Chevrolet', 
-          model: 'Express', 
-          year: 2019, 
-          status: 'Inactive', 
-          count: 5,
-          capacity: 1500,
-          fuel_type: 'Gasoline',
-          status_id: 2,
-          mileage: 75000,
-          created_at: '2023-02-20T09:15:00Z',
-          updated_at: '2024-01-19T16:45:00Z'
-        },
-        { 
-          id: 3, 
-          plate_number: 'LMN456', 
-          type: 'SUV', 
-          make: 'Toyota', 
-          model: 'Highlander', 
-          year: 2021, 
-          status: 'Maintenance', 
-          count: 3,
-          capacity: 1000,
-          fuel_type: 'Hybrid',
-          status_id: 3,
-          mileage: 25000,
-          created_at: '2023-03-10T10:45:00Z',
-          updated_at: '2024-01-18T11:30:00Z'
-        }
-      ]);
-      setDriverPerformance([
-        { id: 1, driverName: 'Alice', performanceScore: 85, deliveryStats: { totalDeliveries: 50, onTime: 45, unloading: 3, waiting: 2 } },
-        { id: 2, driverName: 'Bob', performanceScore: 90, deliveryStats: { totalDeliveries: 60, onTime: 55, unloading: 2, waiting: 3 } },
-      ]);
+      setVehicleStats(dummyVehicleStats);
+      setDriverPerformance(dummyDriverPerformance);
     }
   }, [user?.id]);
 
-  // Aggregate delivery stats
-  const aggregateDeliveryStats = (): DeliveryStats => {
+  // Memoize aggregateDeliveryStats
+  const aggregateDeliveryStats = React.useMemo(() => {
     return driverPerformance.reduce((acc, driver) => ({
       totalDeliveries: acc.totalDeliveries + driver.deliveryStats.totalDeliveries,
       onTime: acc.onTime + driver.deliveryStats.onTime,
@@ -129,7 +154,7 @@ const FleetManagerDashboard: React.FC = () => {
       unloading: 0,
       waiting: 0,
     });
-  };
+  }, [driverPerformance]);
 
   if (loading) {
     return (
@@ -160,7 +185,7 @@ const FleetManagerDashboard: React.FC = () => {
     <div className="p-4">
       <h1 className="text-3xl font-bold mb-4">Fleet Manager Dashboard</h1>
       <VehicleStats data={vehicleStats[0] || null} />
-      <DriverPerformance performance={aggregateDeliveryStats()} />
+      <DriverPerformance performance={aggregateDeliveryStats} />
     </div>
   );
 };
