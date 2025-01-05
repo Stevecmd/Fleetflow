@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import '../../config/chartConfig';
 import { Bar, Line, Pie, Doughnut } from 'react-chartjs-2';
 
 /**
@@ -61,6 +62,49 @@ const ManagerDashboard: React.FC = () => {
     fetchDashboardData();
   }, []);
 
+  const chartContainerStyle = {
+    position: 'relative' as const,
+    height: '300px',
+    width: '100%',
+    padding: '20px'
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom' as const,
+        labels: {
+          boxWidth: 12,
+          padding: 15,
+          usePointStyle: true
+        }
+      }
+    },
+    layout: {
+      padding: {
+        top: 20,
+        bottom: 20,
+        left: 20,
+        right: 20
+      }
+    }
+  };
+
+  // Add specific options for bar chart
+  const barChartOptions = {
+    ...chartOptions,
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          maxRotation: 0
+        }
+      }
+    }
+  };
+
   const revenueChart = {
     labels: revenueData?.map(d => d.month) || [],
     datasets: [{
@@ -69,6 +113,7 @@ const ManagerDashboard: React.FC = () => {
       borderColor: '#4CAF50',
       backgroundColor: 'rgba(76, 175, 80, 0.1)',
       fill: true,
+      tension: 0.4
     }]
   };
 
@@ -192,24 +237,56 @@ const ManagerDashboard: React.FC = () => {
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="bg-white p-6 rounded-lg shadow-md flex flex-col">
           <h2 className="text-xl font-semibold mb-4">Revenue Trend</h2>
-          {revenueData && <Line data={revenueChart} options={{ responsive: true }} />}
+          <div style={chartContainerStyle}>
+            {revenueData && (
+              <Line 
+                data={revenueChart} 
+                options={chartOptions} 
+                className="max-w-full"
+              />
+            )}
+          </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="bg-white p-6 rounded-lg shadow-md flex flex-col">
           <h2 className="text-xl font-semibold mb-4">Delivery Status</h2>
-          {deliveryStats && <Doughnut data={deliveryChart} options={{ responsive: true }} />}
+          <div style={chartContainerStyle}>
+            {deliveryStats && (
+              <Doughnut 
+                data={deliveryChart} 
+                options={chartOptions}
+                className="max-w-full"
+              />
+            )}
+          </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="bg-white p-6 rounded-lg shadow-md flex flex-col">
           <h2 className="text-xl font-semibold mb-4">Fleet Status</h2>
-          {fleetStatus && <Pie data={fleetChart} options={{ responsive: true }} />}
+          <div style={chartContainerStyle}>
+            {fleetStatus && (
+              <Pie 
+                data={fleetChart} 
+                options={chartOptions}
+                className="max-w-full"
+              />
+            )}
+          </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="bg-white p-6 rounded-lg shadow-md flex flex-col">
           <h2 className="text-xl font-semibold mb-4">Performance Metrics</h2>
-          {performanceData && <Bar data={performanceChart} options={{ responsive: true, indexAxis: 'y' }} />}
+          <div style={chartContainerStyle}>
+            {performanceData && (
+              <Bar 
+                data={performanceChart} 
+                options={barChartOptions}
+                className="max-w-full"
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

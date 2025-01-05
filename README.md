@@ -95,7 +95,7 @@ psql -U postgres -f schema.sql
 5. Access the application in your browser:
 - Frontend: http://localhost:3000
 - Backend: http://localhost:8000
-- Adminer: http://localhost:8082
+- Adminer: http://localhost:8090
 - Swagger UI: http://localhost:8000/swagger/index.html
 
 ### Adminer credentails:
