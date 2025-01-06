@@ -157,6 +157,9 @@ func main() {
 	router.HandleFunc("/api/v1/fleet-manager/vehicles", middleware.AuthMiddleware(handlers.GetFleetVehicles(db))).Methods("GET")
 	router.HandleFunc("/api/v1/fleet-manager/performance", middleware.AuthMiddleware(handlers.GetFleetPerformance(db))).Methods("GET")
 	router.HandleFunc("/api/v1/fleet-manager/drivers", middleware.AuthMiddleware(handlers.GetFleetDrivers(db))).Methods("GET")
+	router.HandleFunc("/api/v1/fleet-manager/maintenance-metrics", middleware.AuthMiddleware(handlers.GetMaintenanceMetrics(db))).Methods("GET")
+	router.HandleFunc("/api/v1/fleet-manager/fleet-efficiency", middleware.AuthMiddleware(handlers.GetFleetEfficiency(db))).Methods("GET")
+	router.HandleFunc("/api/v1/fleet-manager/delivery-analytics", middleware.AuthMiddleware(handlers.GetDeliveryAnalytics(db))).Methods("GET")
 
 	// Vehicle routes
 	router.HandleFunc("/api/v1/vehicles", handlers.ListVehicles(db)).Methods("GET")
