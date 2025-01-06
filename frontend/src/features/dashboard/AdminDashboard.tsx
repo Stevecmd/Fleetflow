@@ -3,34 +3,9 @@ import { useAuth } from '../auth/AuthProvider';
 import { api } from '../../services/api'; // Import the api instance
 import { Doughnut, Bar } from 'react-chartjs-2';
 import '../../config/chartConfig';
-
-interface FleetAnalytics {
-  vehicleUtilization: {
-    total: number;
-    active: number;
-    maintenance: number;
-    idle: number;
-    utilizationRate: number;
-  };
-  driverPerformance: {
-    totalDrivers: number;
-    avgRating: number;
-    topPerformers: number;
-    onTime: number;
-  };
-  maintenanceSchedule: {
-    pending: number;
-    completed: number;
-    overdue: number;
-    upcoming: number;
-  };
-  fleetStatus: {
-    operational: number;
-    underMaintenance: number;
-    outOfService: number;
-    total: number;
-  };
-}
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../store'; // Add this import
+import { fetchFleetAnalytics, RootState, FleetAnalytics } from './dashboardSlice';
 
 /**
  * The admin dashboard component.
@@ -42,6 +17,8 @@ interface FleetAnalytics {
  */
 const AdminDashboard: React.FC = () => {
     const { user } = useAuth();
+    const dispatch = useDispatch<AppDispatch>();
+    const fleetAnalytics = useSelector((state: RootState) => state.dashboard.fleetAnalytics);
     const [newUser, setNewUser] = useState({
         username: '',
         password: '',
@@ -64,13 +41,6 @@ const AdminDashboard: React.FC = () => {
             lastBackup: '2024-01-20',
             serverLoad: 45
         }
-    });
-
-    const [fleetAnalytics, setFleetAnalytics] = useState<FleetAnalytics>({
-        vehicleUtilization: { total: 0, active: 0, maintenance: 0, idle: 0, utilizationRate: 0 },
-        driverPerformance: { totalDrivers: 0, avgRating: 0, topPerformers: 0, onTime: 0 },
-        maintenanceSchedule: { pending: 0, completed: 0, overdue: 0, upcoming: 0 },
-        fleetStatus: { operational: 0, underMaintenance: 0, outOfService: 0, total: 0 }
     });
 
     const chartContainerStyle = {
@@ -98,8 +68,8 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         fetchUsers();
         fetchSystemStats();
-        fetchFleetAnalytics();
-    }, []);
+        void dispatch(fetchFleetAnalytics());
+    }, [dispatch]);
 
 /**
  * Fetches the list of users from the API and updates the state.
@@ -141,42 +111,6 @@ const AdminDashboard: React.FC = () => {
             });
         } catch (error) {
             console.error('Error fetching system stats:', error);
-        }
-    };
-
-    const fetchFleetAnalytics = async () => {
-        try {
-            // This will be replaced with actual API calls
-            const analytics = {
-                vehicleUtilization: {
-                    total: 100,
-                    active: 75,
-                    maintenance: 15,
-                    idle: 10,
-                    utilizationRate: 85
-                },
-                driverPerformance: {
-                    totalDrivers: 50,
-                    avgRating: 4.5,
-                    topPerformers: 15,
-                    onTime: 92
-                },
-                maintenanceSchedule: {
-                    pending: 8,
-                    completed: 45,
-                    overdue: 3,
-                    upcoming: 12
-                },
-                fleetStatus: {
-                    operational: 85,
-                    underMaintenance: 10,
-                    outOfService: 5,
-                    total: 100
-                }
-            };
-            setFleetAnalytics(analytics);
-        } catch (error) {
-            console.error('Error fetching fleet analytics:', error);
         }
     };
 
@@ -236,6 +170,10 @@ const AdminDashboard: React.FC = () => {
             }
         }
     };
+
+    if (!fleetAnalytics) {
+        return <div>Loading...</div>;
+    }
 
     const userRolesChart = {
         labels: Object.keys(systemStats.usersByRole),

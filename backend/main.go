@@ -190,6 +190,9 @@ func main() {
 	router.HandleFunc("/api/v1/warehouses/{userID}", middleware.AuthMiddleware(warehouseHandler.UpdateWarehouse)).Methods("PUT")
 	router.HandleFunc("/api/v1/warehouses/{userID}", middleware.AuthMiddleware(warehouseHandler.DeleteWarehouse)).Methods("DELETE")
 
+	// Fleet analytics route
+	router.HandleFunc("/api/v1/fleet-analytics", middleware.AuthMiddleware(handlers.GetFleetAnalytics(db))).Methods("GET")
+
 	// Swagger documentation route
 	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 

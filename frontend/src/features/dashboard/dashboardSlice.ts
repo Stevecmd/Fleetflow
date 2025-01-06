@@ -1,6 +1,35 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../../services/api';
 
+// Define and export interfaces
+export interface FleetAnalytics {
+  vehicleUtilization: {
+    total: number;
+    active: number;
+    maintenance: number;
+    idle: number;
+    utilizationRate: number;
+  };
+  maintenanceSchedule: {
+    pending: number;
+    completed: number;
+    overdue: number;
+    upcoming: number;
+  };
+  driverPerformance: {
+    totalDrivers: number;
+    avgRating: number;
+    topPerformers: number;
+    onTime: number;
+  };
+  fleetStatus: {
+    operational: number;
+    underMaintenance: number;
+    outOfService: number;
+    total: number;
+  };
+}
+
 interface Order {
   id: number;
   from: string;
@@ -28,6 +57,7 @@ interface DashboardState {
   driverMetrics: DriverMetrics | null;
   vehicleInfo: VehicleInfo | null;
   deliveries: Delivery[];
+  fleetAnalytics: FleetAnalytics | null;
 }
 
 interface DriverMetrics {
@@ -60,6 +90,12 @@ interface Delivery {
   cargo_weight: number;
 }
 
+// Export RootState interface
+export interface RootState {
+  dashboard: DashboardState;
+  // Add other state slices if needed
+}
+
 const initialState: DashboardState = {
   vehicleStats: null,
   orders: [],
@@ -77,6 +113,7 @@ const initialState: DashboardState = {
   driverMetrics: null,
   vehicleInfo: null,
   deliveries: [],
+  fleetAnalytics: null,
 };
 
 export interface VehicleData {
@@ -188,6 +225,21 @@ export const fetchDeliveries = createAsyncThunk(
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch deliveries');
+    }
+  }
+);
+
+export const fetchFleetAnalytics = createAsyncThunk(
+  'dashboard/fetchFleetAnalytics',
+  async (_, { rejectWithValue }) => {
+    try {
+      // Fix the API endpoint path
+      const response = await api.get('/fleet-analytics');
+      console.log('Fleet Analytics Response:', response.data); // Add logging
+      return response.data;
+    } catch (error: any) {
+      console.error('Fleet Analytics Error:', error.response); // Add error logging
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch fleet analytics');
     }
   }
 );
@@ -310,6 +362,10 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchDeliveries.fulfilled, (state, action) => {
         state.deliveries = action.payload;
+        state.loading = false;
+      })
+      .addCase(fetchFleetAnalytics.fulfilled, (state, action) => {
+        state.fleetAnalytics = action.payload;
         state.loading = false;
       });
   },
