@@ -15,6 +15,8 @@ type DeliveryHandler struct {
 	repo *repository.DeliveryRepository
 }
 
+// NewDeliveryHandler returns a new instance of DeliveryHandler, which requires a DeliveryRepository
+// to interact with the database.
 func NewDeliveryHandler(repo *repository.DeliveryRepository) *DeliveryHandler {
 	return &DeliveryHandler{repo: repo}
 }

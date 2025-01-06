@@ -1,5 +1,7 @@
 package models
 
+// Invoice represents an invoice for a delivery
+
 type Invoice struct {
 	ID int `json:"id"`
 

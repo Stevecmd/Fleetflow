@@ -1,3 +1,10 @@
+// Package main FleetFlow API
+//
+// @title FleetFlow API
+// @version 1.0
+// @description Fleet management system API
+// @host localhost:8000
+// @BasePath /api/v1
 package main
 
 import (
@@ -12,15 +19,32 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq" // postgres driver
 	"github.com/rs/cors"
+	_ "github.com/stevecmd/Fleetflow/backend/docs" // Import generated docs
 	"github.com/stevecmd/Fleetflow/backend/handlers"
 	"github.com/stevecmd/Fleetflow/backend/middleware"
 	"github.com/stevecmd/Fleetflow/backend/repository"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title FleetFlow API
+// @version 1.0
+// @description This is a sample server for FleetFlow.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:8000
+// @BasePath /api/v1
 func main() {
 	// Set up logging
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
+	// Load environment variables
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -133,6 +157,9 @@ func main() {
 	router.HandleFunc("/api/v1/fleet-manager/vehicles", middleware.AuthMiddleware(handlers.GetFleetVehicles(db))).Methods("GET")
 	router.HandleFunc("/api/v1/fleet-manager/performance", middleware.AuthMiddleware(handlers.GetFleetPerformance(db))).Methods("GET")
 	router.HandleFunc("/api/v1/fleet-manager/drivers", middleware.AuthMiddleware(handlers.GetFleetDrivers(db))).Methods("GET")
+	router.HandleFunc("/api/v1/fleet-manager/maintenance-metrics", middleware.AuthMiddleware(handlers.GetMaintenanceMetrics(db))).Methods("GET")
+	router.HandleFunc("/api/v1/fleet-manager/fleet-efficiency", middleware.AuthMiddleware(handlers.GetFleetEfficiency(db))).Methods("GET")
+	router.HandleFunc("/api/v1/fleet-manager/delivery-analytics", middleware.AuthMiddleware(handlers.GetDeliveryAnalytics(db))).Methods("GET")
 
 	// Vehicle routes
 	router.HandleFunc("/api/v1/vehicles", handlers.ListVehicles(db)).Methods("GET")
@@ -165,6 +192,12 @@ func main() {
 	router.HandleFunc("/api/v1/warehouses/{userID}", warehouseHandler.GetWarehouse).Methods("GET")
 	router.HandleFunc("/api/v1/warehouses/{userID}", middleware.AuthMiddleware(warehouseHandler.UpdateWarehouse)).Methods("PUT")
 	router.HandleFunc("/api/v1/warehouses/{userID}", middleware.AuthMiddleware(warehouseHandler.DeleteWarehouse)).Methods("DELETE")
+
+	// Fleet analytics route
+	router.HandleFunc("/api/v1/fleet-analytics", middleware.AuthMiddleware(handlers.GetFleetAnalytics(db))).Methods("GET")
+
+	// Swagger documentation route
+	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	log.Printf("Server starting on :8000")
 	if err := http.ListenAndServe(":8000", handler); err != nil {

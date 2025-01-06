@@ -92,6 +92,22 @@ cd backend/db/init
 psql -U postgres -f schema.sql
 ```
 
+5. Access the application in your browser:
+- Frontend: http://localhost:3000
+- Backend: http://localhost:8000
+- Adminer: http://localhost:8090
+- Swagger UI: http://localhost:8000/swagger/index.html
+
+### Adminer credentails:
+```sh
+Login credentials:
+System: PostgreSQL
+Server: postgres_db
+Username: postgres_user
+Password: postgres_password
+Database: fleetflow
+```
+
 ## 🔒 Environment Variables
 
 Create a `.env` file in the backend directory with the following variables:

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/lib/pq"
 	"github.com/stevecmd/Fleetflow/backend/models"
@@ -23,6 +24,61 @@ type FleetVehicle struct {
 	LicenseNumber *string `json:"license_number,omitempty"`
 }
 
+type MaintenanceMetrics struct {
+	PendingMaintenance int                   `json:"pending_maintenance"`
+	CompletedLastMonth int                   `json:"completed_last_month"`
+	AverageCost        float64               `json:"average_cost"`
+	UpcomingServices   []MaintenanceSchedule `json:"upcoming_services"`
+}
+
+type MaintenanceSchedule struct {
+	VehicleID     int       `json:"vehicle_id"`
+	PlateNumber   string    `json:"plate_number"`
+	NextService   time.Time `json:"next_service"`
+	ServiceType   string    `json:"service_type"`
+	EstimatedCost float64   `json:"estimated_cost"`
+}
+
+type FleetEfficiencyMetrics struct {
+	FuelEfficiency    float64 `json:"fuel_efficiency"`
+	CarbonEmissions   float64 `json:"carbon_emissions"`
+	OperatingCosts    float64 `json:"operating_costs"`
+	IdleTime          int     `json:"idle_time"`
+	RouteOptimization float64 `json:"route_optimization"`
+}
+
+// GetFleetVehicles retrieves all the vehicles in the fleet, along with their current
+// driver and license number (if applicable).
+//
+// The response is a JSON array of FleetVehicle objects, with the following fields:
+//
+// - id
+// - plate_number
+// - type
+// - make
+// - model
+// - year
+// - capacity
+// - fuel_type
+// - status_id
+// - gps_unit_id
+// - last_maintenance
+// - next_maintenance
+// - mileage
+// - insurance_expiry
+// - current_location_latitude
+// - current_location_longitude
+// - current_location_updated_at
+// - fuel_efficiency_rating
+// - total_fuel_consumption
+// - total_maintenance_cost
+// - vehicle_images
+// - registration_document_image_url
+// - insurance_document_image_url
+// - created_at
+// - updated_at
+// - driver_id (optional)
+// - license_number (optional)
 func GetFleetVehicles(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := `
@@ -86,6 +142,13 @@ func GetFleetVehicles(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// GetFleetPerformance retrieves aggregate performance metrics for the fleet,
+// including the total number of vehicles, total number of drivers, average
+// driver rating, and total number of deliveries. It executes a SQL query to
+// calculate these metrics and returns the data as a JSON response. If an error
+// occurs during the query, it logs the error and sends a 500 Internal Server
+// Error response.
+
 func GetFleetPerformance(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Starting GetFleetPerformance")
@@ -120,6 +183,11 @@ func GetFleetPerformance(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// GetFleetDrivers retrieves a list of all drivers in the fleet, along with
+// their profile information and the vehicle they are currently assigned to.
+// It executes a SQL query to retrieve the data and returns the list of
+// drivers as a JSON response. If an error occurs during the query, it logs
+// the error and sends a 500 Internal Server Error response.
 func GetFleetDrivers(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		query := `
@@ -175,5 +243,154 @@ func GetFleetDrivers(db *sql.DB) http.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(drivers)
+	}
+}
+
+func GetMaintenanceMetrics(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		query := `
+            SELECT 
+                COUNT(CASE WHEN next_service_date > NOW() THEN 1 END) as pending,
+                COUNT(CASE WHEN service_date >= NOW() - INTERVAL '30 days' THEN 1 END) as completed,
+                AVG(cost) as avg_cost
+            FROM maintenance_records
+        `
+		var metrics MaintenanceMetrics
+		err := db.QueryRow(query).Scan(&metrics.PendingMaintenance, &metrics.CompletedLastMonth, &metrics.AverageCost)
+		if err != nil {
+			log.Printf("Error querying maintenance metrics: %v", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+
+		// Get upcoming services
+		upcomingQuery := `
+            SELECT v.id, v.plate_number, m.next_service_date, m.type, m.cost
+            FROM maintenance_records m
+            JOIN vehicles v ON m.vehicle_id = v.id
+            WHERE m.next_service_date > NOW()
+            ORDER BY m.next_service_date
+            LIMIT 5
+        `
+		rows, err := db.Query(upcomingQuery)
+		if err != nil {
+			log.Printf("Error querying upcoming services: %v", err)
+			http.Error(w, "Database error", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			var service MaintenanceSchedule
+			err := rows.Scan(
+				&service.VehicleID,
+				&service.PlateNumber,
+				&service.NextService,
+				&service.ServiceType,
+				&service.EstimatedCost,
+			)
+			if err != nil {
+				log.Printf("Error scanning upcoming service row: %v", err)
+				continue
+			}
+			metrics.UpcomingServices = append(metrics.UpcomingServices, service)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(metrics)
+	}
+}
+
+func GetFleetEfficiency(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		query := `
+            SELECT 
+                COALESCE(AVG(NULLIF(fuel_efficiency_rating, 0)), 0) as fuel_efficiency,
+                COALESCE(SUM(carbon_emissions), 0) as total_emissions,
+                COALESCE(SUM(operating_cost), 0) as total_costs,
+                COALESCE(AVG(NULLIF(idle_time, 0)), 0) as avg_idle_time,
+                COALESCE(AVG(NULLIF(efficiency_score, 0)), 0) as route_efficiency
+            FROM fleet_analytics
+            WHERE analysis_date >= NOW() - INTERVAL '30 days'
+        `
+		var metrics FleetEfficiencyMetrics
+		err := db.QueryRow(query).Scan(
+			&metrics.FuelEfficiency,
+			&metrics.CarbonEmissions,
+			&metrics.OperatingCosts,
+			&metrics.IdleTime,
+			&metrics.RouteOptimization,
+		)
+		if err != nil {
+			log.Printf("Error querying fleet efficiency: %v", err)
+			// Return default values instead of error
+			metrics = FleetEfficiencyMetrics{
+				FuelEfficiency:    0,
+				CarbonEmissions:   0,
+				OperatingCosts:    0,
+				IdleTime:          0,
+				RouteOptimization: 0,
+			}
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(metrics); err != nil {
+			log.Printf("Error encoding response: %v", err)
+			http.Error(w, "Error encoding response", http.StatusInternalServerError)
+			return
+		}
+	}
+}
+
+func GetDeliveryAnalytics(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		query := `
+            SELECT 
+                COUNT(*) as total_deliveries,
+                COALESCE(COUNT(CASE 
+                    WHEN actual_delivery_time IS NOT NULL 
+                    AND actual_delivery_time <= estimated_delivery_time 
+                    THEN 1 
+                END), 0) as on_time,
+                COALESCE(AVG(NULLIF(route_efficiency_score, 0)), 0) as efficiency,
+                COUNT(DISTINCT CASE WHEN status_id = 2 THEN user_id END) as active_drivers
+            FROM deliveries
+            WHERE delivery_time >= NOW() - INTERVAL '30 days'
+        `
+		var analytics struct {
+			TotalDeliveries  int     `json:"total_deliveries"`
+			OnTimeDeliveries int     `json:"on_time_deliveries"`
+			Efficiency       float64 `json:"efficiency"`
+			ActiveDrivers    int     `json:"active_drivers"`
+		}
+
+		err := db.QueryRow(query).Scan(
+			&analytics.TotalDeliveries,
+			&analytics.OnTimeDeliveries,
+			&analytics.Efficiency,
+			&analytics.ActiveDrivers,
+		)
+		if err != nil {
+			log.Printf("Error querying delivery analytics: %v", err)
+			// Return default values instead of error
+			analytics = struct {
+				TotalDeliveries  int     `json:"total_deliveries"`
+				OnTimeDeliveries int     `json:"on_time_deliveries"`
+				Efficiency       float64 `json:"efficiency"`
+				ActiveDrivers    int     `json:"active_drivers"`
+			}{
+				TotalDeliveries:  0,
+				OnTimeDeliveries: 0,
+				Efficiency:       0,
+				ActiveDrivers:    0,
+			}
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(analytics); err != nil {
+			log.Printf("Error encoding response: %v", err)
+			http.Error(w, "Error encoding response", http.StatusInternalServerError)
+			return
+		}
 	}
 }

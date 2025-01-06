@@ -15,12 +15,19 @@ type WarehouseHandler struct {
 	repo *repository.WarehouseRepository
 }
 
+// NewWarehouseHandler initializes and returns a new instance of WarehouseHandler.
+// It requires a database connection to create a new WarehouseRepository.
+
 func NewWarehouseHandler(db *sql.DB) *WarehouseHandler {
 	return &WarehouseHandler{
 		repo: repository.NewWarehouseRepository(db),
 	}
 }
 
+// CreateWarehouse handles POST /api/v1/warehouses
+// It creates a new warehouse entry in the database based on the provided
+// request body, and returns the newly created warehouse entry in the
+// response body.
 func (h *WarehouseHandler) CreateWarehouse(w http.ResponseWriter, r *http.Request) {
 	var req models.CreateWarehouseRequest
 	decoder := json.NewDecoder(r.Body)
@@ -41,6 +48,9 @@ func (h *WarehouseHandler) CreateWarehouse(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(warehouse)
 }
 
+// GetWarehouse handles GET /api/v1/warehouses/{id}
+// It retrieves a single warehouse entry by ID from the database and
+// returns it in the response body.
 func (h *WarehouseHandler) GetWarehouse(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -58,6 +68,11 @@ func (h *WarehouseHandler) GetWarehouse(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(warehouse)
 }
+
+// ListWarehouses handles GET /api/v1/warehouses
+// It retrieves a list of warehouse entries from the database with pagination support.
+// The response is a JSON array of warehouses. Query parameters "limit" and "offset"
+// are used to control pagination. If "limit" is not provided, a default of 10 is used.
 
 func (h *WarehouseHandler) ListWarehouses(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
@@ -78,6 +93,10 @@ func (h *WarehouseHandler) ListWarehouses(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(warehouses)
 }
 
+// UpdateWarehouse handles PUT /api/v1/warehouses/{id}
+// It updates a single warehouse entry by ID in the database with the
+// provided request body and returns the updated warehouse entry in the
+// response body.
 func (h *WarehouseHandler) UpdateWarehouse(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -103,6 +122,11 @@ func (h *WarehouseHandler) UpdateWarehouse(w http.ResponseWriter, r *http.Reques
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(warehouse)
 }
+
+// DeleteWarehouse handles DELETE /api/v1/warehouses/{id}
+// It deletes a single warehouse entry by ID from the database.
+// Returns a 204 No Content status on success, or an error status
+// if the warehouse ID is invalid or the deletion fails.
 
 func (h *WarehouseHandler) DeleteWarehouse(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
