@@ -8,12 +8,17 @@ interface Delivery {
     tracking_number: string;
     status_id: number;
     estimated_delivery_time: string;
+    actual_delivery_time?: string;
+    special_instructions?: string;
     cargo_type: string;
     from_location: string;
     to_location: string;
     cargo_weight: number;
     payment_status: string;
+    route_efficiency_score?: number;
+    weather_conditions?: string;
     proof_of_delivery_image_url?: string;
+    package_condition_images?: string[];
   }
   
   interface DeliveryFeedback {
@@ -34,6 +39,14 @@ interface Delivery {
     due_date: string;
     payment_method?: string;
   }
+
+  interface DeliveryStats {
+    total: number;
+    onTime: number;
+    delayed: number;
+    completed: number;
+    pending: number;
+}
 
 /**
  * CustomerDashboard component displays the dashboard for a logged-in customer.
@@ -62,6 +75,13 @@ interface Delivery {
     const [feedback, setFeedback] = useState<DeliveryFeedback[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [deliveryStats, setDeliveryStats] = useState<DeliveryStats>({
+        total: 0,
+        onTime: 0,
+        delayed: 0,
+        completed: 0,
+        pending: 0
+    });
 
     useEffect(() => {
         const fetchCustomerData = async () => {
@@ -101,11 +121,55 @@ interface Delivery {
         fetchCustomerData();
     }, [user?.id]);
 
+    useEffect(() => {
+        // Calculate delivery statistics
+        const stats = deliveries.reduce((acc, delivery) => {
+            acc.total++;
+            if (delivery.actual_delivery_time) {
+                const actualDate = new Date(delivery.actual_delivery_time);
+                const estimatedDate = new Date(delivery.estimated_delivery_time);
+                acc.onTime += actualDate <= estimatedDate ? 1 : 0;
+                acc.delayed += actualDate > estimatedDate ? 1 : 0;
+            }
+            acc.completed += delivery.status_id === 3 ? 1 : 0; // Assuming 3 is 'delivered' status
+            acc.pending += delivery.status_id === 1 ? 1 : 0;  // Assuming 1 is 'pending' status
+            return acc;
+        }, {
+            total: 0,
+            onTime: 0,
+            delayed: 0,
+            completed: 0,
+            pending: 0
+        });
+        
+        setDeliveryStats(stats);
+    }, [deliveries]);
+
     return (
         <div className="p-6 max-w-7xl mx-auto">
             <h1 className="text-2xl font-bold mb-6">
                 Welcome, {user?.first_name}!
             </h1>
+
+            {/* Add Statistics Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-white rounded-lg shadow p-4">
+                    <h3 className="text-gray-500 text-sm">Total Deliveries</h3>
+                    <p className="text-2xl font-bold">{deliveryStats.total}</p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                    <h3 className="text-gray-500 text-sm">On-Time Deliveries</h3>
+                    <p className="text-2xl font-bold text-green-600">{deliveryStats.onTime}</p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                    <h3 className="text-gray-500 text-sm">Pending Deliveries</h3>
+                    <p className="text-2xl font-bold text-yellow-600">{deliveryStats.pending}</p>
+                </div>
+                <div className="bg-white rounded-lg shadow p-4">
+                    <h3 className="text-gray-500 text-sm">Completed Deliveries</h3>
+                    <p className="text-2xl font-bold text-blue-600">{deliveryStats.completed}</p>
+                </div>
+            </div>
 
             {/* Active Deliveries Section */}
             <div className="grid gap-6 mb-8">
@@ -122,22 +186,44 @@ interface Delivery {
                                 {deliveries.map(delivery => (
                                     <div key={delivery.tracking_number} 
                                          className="border p-4 rounded-lg hover:bg-gray-50">
-                                        <div className="flex justify-between items-center">
+                                        <div className="flex justify-between items-start">
                                             <div>
                                                 <p className="font-medium">Tracking: {delivery.tracking_number}</p>
-                                                <p className="text-gray-600">From: {delivery.from_location}</p>
+                                                <p className="text-gray-600">Cargo: {delivery.cargo_type}</p>
                                                 <p className="text-gray-600">Weight: {delivery.cargo_weight}kg</p>
                                                 <p className="text-gray-600">
-                                                    Estimated Delivery: {new Date(delivery.estimated_delivery_time).toLocaleDateString()}
+                                                    Estimated Delivery: {new Date(delivery.estimated_delivery_time).toLocaleString()}
                                                 </p>
+                                                {delivery.special_instructions && (
+                                                    <p className="text-amber-600 mt-2">
+                                                        Note: {delivery.special_instructions}
+                                                    </p>
+                                                )}
                                             </div>
-                                            <span className={`px-3 py-1 rounded-full text-sm ${
-                                                delivery.payment_status === 'paid' ? 'bg-green-100 text-green-800' :
-                                                'bg-yellow-100 text-yellow-800'
-                                            }`}>
-                                                {delivery.payment_status || 'Pending'}
-                                            </span>
+                                            <div className="text-right">
+                                                <span className={`px-3 py-1 rounded-full text-sm ${
+                                                    delivery.payment_status === 'paid' 
+                                                        ? 'bg-green-100 text-green-800' 
+                                                        : 'bg-yellow-100 text-yellow-800'
+                                                }`}>
+                                                    {delivery.payment_status}
+                                                </span>
+                                                {delivery.route_efficiency_score && (
+                                                    <p className="text-sm text-gray-500 mt-2">
+                                                        Efficiency: {Math.round(delivery.route_efficiency_score * 100)}%
+                                                    </p>
+                                                )}
+                                            </div>
                                         </div>
+                                        {delivery.proof_of_delivery_image_url && (
+                                            <div className="mt-4">
+                                                <img 
+                                                    src={delivery.proof_of_delivery_image_url} 
+                                                    alt="Proof of delivery" 
+                                                    className="w-20 h-20 object-cover rounded"
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
