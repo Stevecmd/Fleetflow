@@ -1,8 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../auth/AuthProvider';
 import { api } from '../../services/api'; // Import the api instance
-import { Doughnut } from 'react-chartjs-2';
+import { Doughnut, Bar } from 'react-chartjs-2';
 import '../../config/chartConfig';
+
+interface FleetAnalytics {
+  vehicleUtilization: {
+    total: number;
+    active: number;
+    maintenance: number;
+    idle: number;
+    utilizationRate: number;
+  };
+  driverPerformance: {
+    totalDrivers: number;
+    avgRating: number;
+    topPerformers: number;
+    onTime: number;
+  };
+  maintenanceSchedule: {
+    pending: number;
+    completed: number;
+    overdue: number;
+    upcoming: number;
+  };
+  fleetStatus: {
+    operational: number;
+    underMaintenance: number;
+    outOfService: number;
+    total: number;
+  };
+}
 
 /**
  * The admin dashboard component.
@@ -38,6 +66,13 @@ const AdminDashboard: React.FC = () => {
         }
     });
 
+    const [fleetAnalytics, setFleetAnalytics] = useState<FleetAnalytics>({
+        vehicleUtilization: { total: 0, active: 0, maintenance: 0, idle: 0, utilizationRate: 0 },
+        driverPerformance: { totalDrivers: 0, avgRating: 0, topPerformers: 0, onTime: 0 },
+        maintenanceSchedule: { pending: 0, completed: 0, overdue: 0, upcoming: 0 },
+        fleetStatus: { operational: 0, underMaintenance: 0, outOfService: 0, total: 0 }
+    });
+
     const chartContainerStyle = {
         position: 'relative' as const,
         height: '300px',
@@ -63,6 +98,7 @@ const AdminDashboard: React.FC = () => {
     useEffect(() => {
         fetchUsers();
         fetchSystemStats();
+        fetchFleetAnalytics();
     }, []);
 
 /**
@@ -105,6 +141,42 @@ const AdminDashboard: React.FC = () => {
             });
         } catch (error) {
             console.error('Error fetching system stats:', error);
+        }
+    };
+
+    const fetchFleetAnalytics = async () => {
+        try {
+            // This will be replaced with actual API calls
+            const analytics = {
+                vehicleUtilization: {
+                    total: 100,
+                    active: 75,
+                    maintenance: 15,
+                    idle: 10,
+                    utilizationRate: 85
+                },
+                driverPerformance: {
+                    totalDrivers: 50,
+                    avgRating: 4.5,
+                    topPerformers: 15,
+                    onTime: 92
+                },
+                maintenanceSchedule: {
+                    pending: 8,
+                    completed: 45,
+                    overdue: 3,
+                    upcoming: 12
+                },
+                fleetStatus: {
+                    operational: 85,
+                    underMaintenance: 10,
+                    outOfService: 5,
+                    total: 100
+                }
+            };
+            setFleetAnalytics(analytics);
+        } catch (error) {
+            console.error('Error fetching fleet analytics:', error);
         }
     };
 
@@ -173,6 +245,32 @@ const AdminDashboard: React.FC = () => {
         }]
     };
 
+    const fleetStatusChart = {
+        labels: ['Operational', 'Under Maintenance', 'Out of Service'],
+        datasets: [{
+            data: [
+                fleetAnalytics.fleetStatus.operational,
+                fleetAnalytics.fleetStatus.underMaintenance,
+                fleetAnalytics.fleetStatus.outOfService
+            ],
+            backgroundColor: ['#4CAF50', '#FFC107', '#F44336']
+        }]
+    };
+
+    const maintenanceChart = {
+        labels: ['Completed', 'Pending', 'Overdue', 'Upcoming'],
+        datasets: [{
+            label: 'Maintenance Status',
+            data: [
+                fleetAnalytics.maintenanceSchedule.completed,
+                fleetAnalytics.maintenanceSchedule.pending,
+                fleetAnalytics.maintenanceSchedule.overdue,
+                fleetAnalytics.maintenanceSchedule.upcoming
+            ],
+            backgroundColor: ['#4CAF50', '#2196F3', '#F44336', '#FFC107']
+        }]
+    };
+
     return (
         <div className="p-6 bg-gray-100">
             <div className="mb-8">
@@ -225,6 +323,55 @@ const AdminDashboard: React.FC = () => {
                                     </p>
                                 </div>
                             ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Fleet Analytics Section */}
+            <div className="mb-8">
+                <h2 className="text-2xl font-bold mb-6">Fleet Analytics</h2>
+                
+                {/* Fleet Metrics */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-gray-500 text-sm font-medium">Vehicle Utilization</h3>
+                        <p className="text-3xl font-bold mt-2">{fleetAnalytics.vehicleUtilization.utilizationRate}%</p>
+                        <p className="text-gray-400 text-sm mt-2">{fleetAnalytics.vehicleUtilization.active} active vehicles</p>
+                    </div>
+                    
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-gray-500 text-sm font-medium">Driver Performance</h3>
+                        <p className="text-3xl font-bold mt-2">{fleetAnalytics.driverPerformance.avgRating}/5.0</p>
+                        <p className="text-gray-400 text-sm mt-2">{fleetAnalytics.driverPerformance.onTime}% on-time delivery</p>
+                    </div>
+                    
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-gray-500 text-sm font-medium">Maintenance</h3>
+                        <p className="text-3xl font-bold mt-2">{fleetAnalytics.maintenanceSchedule.pending}</p>
+                        <p className="text-gray-400 text-sm mt-2">Pending maintenance tasks</p>
+                    </div>
+                    
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-gray-500 text-sm font-medium">Fleet Status</h3>
+                        <p className="text-3xl font-bold mt-2">{fleetAnalytics.fleetStatus.operational}</p>
+                        <p className="text-gray-400 text-sm mt-2">Vehicles operational</p>
+                    </div>
+                </div>
+
+                {/* Fleet Analytics Charts */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-xl font-semibold mb-4">Fleet Status Overview</h3>
+                        <div style={chartContainerStyle}>
+                            <Doughnut data={fleetStatusChart} options={chartOptions} />
+                        </div>
+                    </div>
+                    
+                    <div className="bg-white p-6 rounded-lg shadow-md">
+                        <h3 className="text-xl font-semibold mb-4">Maintenance Schedule</h3>
+                        <div style={chartContainerStyle}>
+                            <Bar data={maintenanceChart} options={chartOptions} />
                         </div>
                     </div>
                 </div>
